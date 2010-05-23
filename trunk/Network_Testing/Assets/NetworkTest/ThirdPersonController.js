@@ -83,6 +83,18 @@ function Awake ()
 	//moveDirection = transform.TransformDirection(Vector3.forward);
 }
 
+function HidePlayer()
+{
+	GetComponent(MeshRenderer).enabled = false; // stop rendering the player.
+	isControllable = false;	// disable player controls.
+}
+
+function ShowPlayer()
+{
+	GetComponent(MeshRenderer).enabled = true; // start rendering the player again.
+	isControllable = true;	// allow player to control the character again.
+}
+
 function UpdateSmoothedMovementDirection ()
 {
 	var cameraTransform = Camera.main.transform;
