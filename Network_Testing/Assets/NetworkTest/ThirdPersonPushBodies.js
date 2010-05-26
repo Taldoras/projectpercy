@@ -7,6 +7,7 @@ private var controller : ThirdPersonController;
 function Start ()
 {
 	controller = GetComponent (ThirdPersonController);
+	//Debug.Log("Spawn point type is: "+GameObject.Find("SpawnPoint"));
 }
 
 function OnControllerColliderHit (hit : ControllerColliderHit)
@@ -47,5 +48,10 @@ function OnControllerColliderHit (hit : ControllerColliderHit)
 		//Debug.Log("Hit object position pre push: "+controller.transform.position);
 		controller.transform.position = controller.transform.position + (pushDir * pushPower);
 		//Debug.Log("Hit object position post push: "+controller.transform.position);		
+		
+		var victim : GameObject = hit.collider.gameObject; 
+		victim.SendMessage("SetAttacker", this.gameObject);
+		Debug.Log(this.gameObject.GetInstanceID()+" attacked "+victim.GetInstanceID());
 	}	
 }
+

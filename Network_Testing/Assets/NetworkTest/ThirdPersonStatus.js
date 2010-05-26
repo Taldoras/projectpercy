@@ -1,6 +1,7 @@
 
 private var score : int;
 private var respawnPosition : Vector3;
+private var attacker : GameObject = null;
 
 function Start()
 {
@@ -26,3 +27,29 @@ function Respawn ()
 
 	SendMessage("ShowPlayer");	// Show the player again
 }
+
+function SetAttacker(attackedBy : GameObject)
+{
+	Debug.Log(this.gameObject.GetInstanceID()+" was attacked by "+attackedBy.GetInstanceID());
+	attacker = attackedBy;
+}
+
+function GetAttacker()
+{
+	return attacker;
+}
+
+function AwardPoint()
+{
+	score++;
+	Debug.Log("Point awarded to "+this.gameObject.GetInstanceID()+" score now "+score);
+	return score;
+}
+
+function RemovePoint()
+{
+	score--;
+	Debug.Log("Suicide! Point removed from "+this.gameObject.GetInstanceID()+" score now "+score);
+	return score;
+}
+

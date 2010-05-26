@@ -12,6 +12,8 @@ class PlayerInfo {
 	var transformViewID : NetworkViewID;
 	//var animationViewID : NetworkViewID;
 	var player : NetworkPlayer;
+	var ready : boolean = false;
+	var playerId : int = 0; 
 }
 
 function OnGUI () {
@@ -70,6 +72,8 @@ function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : Networ
 		playerInstance.transformViewID = transformViewID;
 		//playerInstance.animationViewID = animationViewID;
 		playerInstance.player = playerIdentifier;
+		playerInstance.playerId = instantiatedPlayer.gameObject.GetInstanceID();
+		Debug.Log("playerId: "+playerInstance.playerId); 
 		playerInfo.Add(playerInstance);
 		Debug.Log("There are now " + playerInfo.length + " players active");
 	}
