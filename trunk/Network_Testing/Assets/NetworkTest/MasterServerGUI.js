@@ -1,6 +1,6 @@
 DontDestroyOnLoad(this);
 
-var gameName = "REK Game";
+var gameName = "Sumo Showdown";
 var serverPort = 25002;
 
 private var timeoutHostList = 0.0;
@@ -146,7 +146,7 @@ function MakeWindow (id : int) {
 		if (GUILayout.Button ("Start Server"))
 		{
 			Network.InitializeServer(32, serverPort);
-			MasterServer.RegisterHost(gameName, "stuff", "l33t game for all");
+			MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
 		}
 		runDedicated = GUILayout.Toggle(runDedicated, "Run as dedicated");
 		if(runDedicated)
