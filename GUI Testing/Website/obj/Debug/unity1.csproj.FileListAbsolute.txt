@@ -1,0 +1,10 @@
+C:\FileStore\unity1\unity1\bin\unity1.dll
+C:\FileStore\unity1\unity1\bin\unity1.pdb
+C:\FileStore\unity1\unity1\obj\Debug\ResolveAssemblyReference.cache
+C:\FileStore\unity1\unity1\obj\Debug\unity1.dll
+C:\FileStore\unity1\unity1\obj\Debug\unity1.pdb
+C:\FileStore\unity1\www\bin\unity1.dll
+C:\FileStore\unity1\www\bin\unity1.pdb
+C:\FileStore\unity1\www\obj\Debug\ResolveAssemblyReference.cache
+C:\FileStore\unity1\www\obj\Debug\unity1.dll
+C:\FileStore\unity1\www\obj\Debug\unity1.pdb
