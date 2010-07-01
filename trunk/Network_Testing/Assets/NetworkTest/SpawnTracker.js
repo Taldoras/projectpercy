@@ -5,15 +5,17 @@ private var localPlayer : NetworkPlayer;
 private var localTransformViewID : NetworkViewID;
 //private var localAnimationViewID : NetworkViewID;
 private var isInstantiated : boolean = false;
-// The server uses this to track all intanticated player
+// The server uses this to track all intantiated player
 private var playerInfo : Array = new Array();
+
+private var scoreInfo : Rect = new Rect (0,Screen.height - 170,160,180);
 
 class PlayerInfo {
 	var transformViewID : NetworkViewID;
 	//var animationViewID : NetworkViewID;
 	var player : NetworkPlayer;
 	var ready : boolean = false;
-	var playerId : int = 0; 
+	var score : int = 0;
 }
 
 function OnGUI () {
@@ -24,6 +26,8 @@ function OnGUI () {
 			networkView.RPC("SpawnPlayer", RPCMode.AllBuffered, localPlayer, localTransformViewID);//, localAnimationViewID);
 			isInstantiated = true;
 		}
+		
+	scoreInfo = GUILayout.Window(2, scoreInfo, ScoreWindow, "Scores");		
 }
 
 // Receive server initialization, record own identifier as seen by the server.
@@ -45,6 +49,9 @@ function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : Networ
 	var instantiatedPlayer : Transform = Instantiate(playerPrefab, transform.position, transform.rotation);
 	var networkViews = instantiatedPlayer.GetComponents(NetworkView);
 	
+	//set the id on the instance so we can communicate with other components 
+	instantiatedPlayer.GetComponent (ThirdPersonStatus).setPlayerID(transformViewID);
+	
 	// Assign view IDs to player object
 	if (networkViews.Length != 1) {
 		Debug.Log("Error while spawning player, prefab should have 1 network views, has "+networkViews.Length);
@@ -57,26 +64,27 @@ function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : Networ
 	if (playerIdentifier == localPlayer) {
 		Debug.Log("Enabling user input as this is the local player");
 		// W are doing client prediction and thus enable the controller script + user input processing
-		instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
+		//instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
 		instantiatedPlayer.GetComponent(ThirdPersonController).getUserInput = true;
 		// Enable input network synchronization (server gets input)
 		instantiatedPlayer.GetComponent(NetworkController).enabled = true;
 		instantiatedPlayer.SendMessage("SetOwnership", playerIdentifier);
-		return;
+		//return;
 	// Initialize player on server
-	} else if (Network.isServer) {
-		instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
-		//instantiatedPlayer.GetComponent(AuthServerPersonAnimation).enabled = true;
-		// Record player info so he can be destroyed properly
-		var playerInstance : PlayerInfo = new PlayerInfo();
-		playerInstance.transformViewID = transformViewID;
-		//playerInstance.animationViewID = animationViewID;
-		playerInstance.player = playerIdentifier;
-		playerInstance.playerId = instantiatedPlayer.gameObject.GetInstanceID();
-		Debug.Log("playerId: "+playerInstance.playerId); 
-		playerInfo.Add(playerInstance);
-		Debug.Log("There are now " + playerInfo.length + " players active");
+	//} else if (Network.isServer) {
 	}
+	
+	instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
+	//instantiatedPlayer.GetComponent(AuthServerPersonAnimation).enabled = true;
+	// Record player info so he can be destroyed properly
+	var playerInstance : PlayerInfo = new PlayerInfo();
+	playerInstance.transformViewID = transformViewID;
+	//playerInstance.animationViewID = animationViewID;
+	playerInstance.player = playerIdentifier;
+	Debug.Log("playerId (transformViewID): "+playerInstance.transformViewID); 
+	playerInfo.Add(playerInstance);
+	Debug.Log("There are now " + playerInfo.length + " players active");
+	
 }
 
 // This runs if the scene is executed from the loader scene.
@@ -108,7 +116,20 @@ function OnPlayerConnected (player : NetworkPlayer) {
 
 }
 
-function OnPlayerDisconnected (player : NetworkPlayer) {
+function OnPlayerDisconnected (player : NetworkPlayer) 
+{
+	cleanPlayer( player );
+}
+
+function CleanUpPlayer(player : GameObject)
+{
+	Debug.Log("CleanUpPlayer called");
+	netPlayer = player.GetComponent(NetworkPlayer);
+	cleanPlayer(netPlayer);
+}
+
+function cleanPlayer( player : NetworkPlayer )
+{
 	Debug.Log("Cleaning up player " + player);
 	// Destroy the player object this network player spawned
 	var deletePlayer : PlayerInfo;
@@ -122,6 +143,52 @@ function OnPlayerDisconnected (player : NetworkPlayer) {
 	playerInfo.Remove(deletePlayer);
 	Network.RemoveRPCs(player, 0);
 	Network.DestroyPlayerObjects(player);
+}
+
+function setPlayerScore(transformViewID : NetworkViewID, score : int)
+{
+	var playerInstance = getPlayer(transformViewID);
+	if(playerInstance)
+	{
+		networkView.RPC("updateScore",RPCMode.All, playerInstance.transformViewID, score);
+	}
+	else
+	{
+		Debug.Log("SpawnTracker.setPlayerScore: Player not found!");
+	}
+}
+
+@RPC
+function updateScore(transformViewID : NetworkViewID, score : int)
+{
+	var playerInstance : PlayerInfo = getPlayer(transformViewID);
+	if(playerInstance)
+	{
+			Debug.Log("updateScore: "+score);
+			playerInstance.score = score;
+	}
+}
+
+function getPlayer(transformViewID : NetworkViewID)
+{
+	var tagetPlayer : PlayerInfo = null;
+	for(var playerInstance : PlayerInfo in playerInfo)
+	{
+		if(playerInstance.transformViewID == transformViewID)
+		{
+			targetPlayer = playerInstance;
+		}
+	}	
+	
+	return targetPlayer;
+}
+
+function ScoreWindow(windowID : int) 
+{	
+	for(var playerInstance : PlayerInfo in playerInfo)
+	{
+		GUILayout.Label(playerInstance.transformViewID+" score: "+playerInstance.score);
+	}
 }
 
 function Update () {
