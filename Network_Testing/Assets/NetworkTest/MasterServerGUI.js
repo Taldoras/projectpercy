@@ -3,6 +3,9 @@ DontDestroyOnLoad(this);
 var gameName = "Sumo Showdown";
 var serverPort = 25002;
 
+var directIP = "127.0.0.1";
+var directPort = "25002";
+
 private var timeoutHostList = 0.0;
 private var lastHostListRequest = -1000.0;
 private var hostListRefreshTimeout = 10.0;
@@ -17,17 +20,20 @@ private var windowRect = Rect (Screen.width-300,0,300,100);
 private var hideTest = false;
 private var testMessage = "Undetermined NAT capabilities";
 private var runDedicated = false;
+private var directConnect = false;
 
 // Enable this if not running a client on the server machine
 //MasterServer.dedicatedServer = true;
 
 function OnFailedToConnectToMasterServer(info: NetworkConnectionError)
 {
+	Debug.Log("Connection to Master Server failed!");
 	Debug.Log(info);
 }
 
 function OnFailedToConnect(info: NetworkConnectionError)
 {
+	Debug.Log("Failed to connect!");
 	Debug.Log(info);
 }
 
@@ -121,12 +127,13 @@ function TestConnection() {
 		default: 
 			testMessage = "Error in test routine, got " + natCapable;
 	}
-	//Debug.Log(natCapable + " " + probingPublicIP + " " + doneTesting);
+	Debug.Log(natCapable + " " + probingPublicIP + " " + doneTesting);
 }
 
 function MakeWindow (id : int) {
 	
 	hideTest = GUILayout.Toggle(hideTest, "Hide test info");
+	directConnect = GUILayout.Toggle(directConnect, "Direct Connect");
 	
 	if (!hideTest) {
 		GUILayout.Label(testMessage);
@@ -138,9 +145,13 @@ function MakeWindow (id : int) {
 			natCapable = Network.TestConnection(true);
 		}
 	}
-	
+
+	directIP = GUILayout.TextField(directIP, 25);
+	directPort = GUILayout.TextField(directPort,10);
+
 	if (Network.peerType == NetworkPeerType.Disconnected)
 	{
+		//Debug.Log("disconn type is "+NetworkPeerType.Disconnected);
 		GUILayout.BeginHorizontal();
 		// Start a new server
 		if (GUILayout.Button ("Start Server"))
@@ -172,49 +183,68 @@ function MakeWindow (id : int) {
 
 		GUILayout.Space(5);
 
-		var data : HostData[] = MasterServer.PollHostList();
-		for (var element in data)
+		if(!directConnect)
 		{
-			GUILayout.BeginHorizontal();
-
-			// Do not display NAT enabled games if we cannot do NAT punchthrough
-			if ( !(filterNATHosts && element.useNat) )
+			var data : HostData[] = MasterServer.PollHostList();
+			for (var element in data)
 			{
-				var name = element.gameName + " " + element.connectedPlayers + " / " + element.playerLimit;
-				GUILayout.Label(name);	
-				GUILayout.Space(5);
-				var hostInfo;
-				hostInfo = "[";
-				// Here we display all IP addresses, there can be multiple in cases where
-				// internal LAN connections are being attempted. In the GUI we could just display
-				// the first one in order not confuse the end user, but internally Unity will
-				// do a connection check on all IP addresses in the element.ip list, and connect to the
-				// first valid one.
-				for (var host in element.ip)
+				GUILayout.BeginHorizontal();
+				Debug.Log("Hosts found.");
+				// Do not display NAT enabled games if we cannot do NAT punchthrough
+				if ( !(filterNATHosts && element.useNat) )
 				{
-					hostInfo = hostInfo + host + ":" + element.port + " ";
+					//Debug.Log("NAT punchthrough.");
+					var name = element.gameName + " " + element.connectedPlayers + " / " + element.playerLimit;
+					GUILayout.Label(name);	
+					GUILayout.Space(5);
+					var hostInfo;
+					hostInfo = "[";
+					// Here we display all IP addresses, there can be multiple in cases where
+					// internal LAN connections are being attempted. In the GUI we could just display
+					// the first one in order not confuse the end user, but internally Unity will
+					// do a connection check on all IP addresses in the element.ip list, and connect to the
+					// first valid one.
+					for (var host in element.ip)
+					{
+						hostInfo = hostInfo + host + ":" + element.port + " ";
+					}
+					hostInfo = hostInfo + "]";
+					//GUILayout.Label("[" + element.ip + ":" + element.port + "]");	
+					GUILayout.Label(hostInfo);	
+					GUILayout.Space(5);
+					GUILayout.Label(element.comment);
+					GUILayout.Space(5);
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button("Connect"))
+					{
+						// Enable NAT functionality based on what the hosts if configured to do
+						Network.useNat = element.useNat;
+						if (Network.useNat)
+							print("Using Nat punchthrough to connect");
+						else
+							print("Connecting directly to host");
+							
+						if(!directConnect)
+							Network.Connect(element.ip, element.port);			
+						//Network.Connect("127.0.0.1", element.port);			
+					}
 				}
-				hostInfo = hostInfo + "]";
-				//GUILayout.Label("[" + element.ip + ":" + element.port + "]");	
-				GUILayout.Label(hostInfo);	
-				GUILayout.Space(5);
-				GUILayout.Label(element.comment);
-				GUILayout.Space(5);
-				GUILayout.FlexibleSpace();
+				else
+				{
+					Debug.Log("No NAT");
+				}
+				GUILayout.EndHorizontal();	
+			}
+		}
+		else
+		{
 				if (GUILayout.Button("Connect"))
 				{
-					// Enable NAT functionality based on what the hosts if configured to do
-					Network.useNat = element.useNat;
-					if (Network.useNat)
-						print("Using Nat punchthrough to connect");
-					else
-						print("Connecting directly to host");
-					Network.Connect(element.ip, element.port);			
-					//Network.Connect("127.0.0.1", element.port);			
-				}
-			}
-			GUILayout.EndHorizontal();	
+					Debug.Log("Attempting connection to "+directIP+":"+directPort);
+					Network.Connect(directIP, parseInt(directPort));
+				}				
 		}
+			
 	}
 	else
 	{

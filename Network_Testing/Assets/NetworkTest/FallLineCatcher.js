@@ -1,8 +1,8 @@
-private var gameMaster : GameObject;
+private var spawnManager : GameObject;
 
 function Start()
 {
-	gameMaster = GameObject.Find("SpawnPoint");
+	spawnManager = GameObject.Find("SpawnPoint");
 }
 
 function OnTriggerEnter (other : Collider)

@@ -21,7 +21,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 	
 	Component targetController;
 	FieldInfo isMovingFieldInfo;
-		
+	
 	internal struct  State
 	{
 		internal double timestamp;
@@ -56,6 +56,8 @@ public class GraduallyUpdateState : MonoBehaviour {
 	bool m_FixError = false;
 	Vector3 m_NewPosition;
 	
+	GameObject spawnTracker;		
+	
 	// The position vector distance to start error correction. The higher the latency the higher this
 	// value should be or it constantly tries to correct errors in prediction, of course this depends
 	// on the game too.
@@ -66,11 +68,13 @@ public class GraduallyUpdateState : MonoBehaviour {
 	public float m_TimeThreshold = 0.05F;
 		
 	Rect connInfo = new Rect (Screen.width-170,40,160,80);
+	Rect playerInfo = new Rect(0, 0, 160, 80);
 	
 	// We need to grab a reference to the isMoving variable in the javascript ThirdPersonController script
 	void Start() {
 		targetController = GetComponent("ThirdPersonController");
 		isMovingFieldInfo=targetController.GetType().GetField("isMoving");
+		spawnTracker = GameObject.Find("SpawnPoint");
 	}
 	
 	// Convert field info from character controller script to a local bool variable
@@ -143,13 +147,25 @@ public class GraduallyUpdateState : MonoBehaviour {
 		}
 	}
 	
-	void OnGUI() {
-		if (m_IsMine) {
+	void OnGUI() 
+	{
+		if (m_IsMine) 
+		{
 			connInfo = GUILayout.Window(0, connInfo, MakeConnInfoWindow, "Local Player");
+		}
+		else
+		{
+			playerInfo = GUILayout.Window(1, playerInfo, MakeNetPlayerInfoWindow, "Net Player");
 		}
 	}
 	
-	void MakeConnInfoWindow(int windowID) {
+	void MakeNetPlayerInfoWindow(int windowID)
+	{
+		GUILayout.Label(string.Format("Latest Pos: {0},{1},{2}", m_BufferedState[0].pos.x,m_BufferedState[0].pos.y,m_BufferedState[0].pos.z));
+	}
+	
+	void MakeConnInfoWindow(int windowID) 
+	{
 		//GUILayout.BeginVertical();
 		GUILayout.Label(string.Format("{0} msg/s {1,4:f3} ms", m_MsgRate, m_MsgLatency));
 		GUILayout.Label(string.Format("Time Difference : {0,3:f3}", m_TimeAccuracy));
@@ -166,6 +182,8 @@ public class GraduallyUpdateState : MonoBehaviour {
 			}
 			m_MsgLatencyTotal = 0;
 		}
+		GUILayout.Label(string.Format("Fix Error : {0}", m_FixError));
+		GUILayout.Label(string.Format("Latest Pos: {0},{1},{2}", m_BufferedState[0].pos.x,m_BufferedState[0].pos.y,m_BufferedState[0].pos.z));
 	}
 	
 	// The network sync routine makes sure m_BufferedState always contains the last 20 updates
@@ -219,14 +237,16 @@ public class GraduallyUpdateState : MonoBehaviour {
 		}
 	}
 	
-	void SetOwnership() {
+	void SetOwnership() 
+	{
 		Debug.Log("Setting ownership for local player");
 		m_IsMine = true;
 		StartCoroutine(MonitorLocalMovement());
 	}
 	
 	// This only runs where the component is enabled, which is only on remote peers (server/clients)
-	void Update () {
+	void Update () 
+	{
 		double currentTime = Network.time;
 		double interpolationTime = currentTime - m_InterpolationBackTime;
 		// We have a window of interpolationBackTime where we basically play 
@@ -288,5 +308,32 @@ public class GraduallyUpdateState : MonoBehaviour {
 				//Debug.Log("Extrapolating " + latest.pos);
 			}
 		}
+	}
+
+	void OnDisconnectedFromServer(NetworkDisconnection info)  
+	{
+		if (Network.isServer)
+		{
+			Debug.Log("Local server connection disconnected");
+		}
+		else 
+		{
+			if (info == NetworkDisconnection.LostConnection)
+				Debug.Log("Lost connection to the server");
+			else
+			{
+				Debug.Log("Successfully diconnected from the server.  PeerType now "+Network.peerType);
+			}
+			if (spawnTracker == null)
+			{
+				Debug.Log("SpawnTracker is null");
+			}
+			else
+			{
+				//FIX ME this locks unity client on disconnection from server
+				//spawnTracker.SendMessage("CleanUpPlayer", gameObject);
+			}
+		}
+		//Destroy(gameObject);
 	}
 }
