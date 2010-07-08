@@ -25,7 +25,10 @@ function DidChangeTarget ()
 {
 	if (target)
 	{
-		var characterController : CharacterController = target.collider;
+		Debug.Log("before prob");
+		//var characterController : CharacterController = target.collider;
+		var characterController : CharacterController = target.GetComponent(CharacterController);
+		Debug.Log("after prob");
 		if (characterController)
 		{
 			centerOffset = characterController.bounds.center - target.position;

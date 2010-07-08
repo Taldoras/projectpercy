@@ -8,7 +8,6 @@ private var playerId : NetworkViewID;
 function Start()
 {
     spawnManager = GameObject.Find("SpawnPoint").GetComponent(SpawnTracker);
-	Debug.Log("!!!!! SpawnTracker is "+spawnManager);
 	//respawnPosition = transform.Find("SpawnPoint").position;
 	respawnPosition = spawnManager.transform.position;
 }

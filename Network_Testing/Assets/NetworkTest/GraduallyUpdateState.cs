@@ -56,7 +56,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 	bool m_FixError = false;
 	Vector3 m_NewPosition;
 	
-	GameObject spawnTracker;		
+	GameObject spawnTracker = null;		
 	
 	// The position vector distance to start error correction. The higher the latency the higher this
 	// value should be or it constantly tries to correct errors in prediction, of course this depends
@@ -67,7 +67,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 	// highly unreliable and you might try to correct more errors than there really are.
 	public float m_TimeThreshold = 0.05F;
 		
-	Rect connInfo = new Rect (Screen.width-170,40,160,80);
+	Rect connInfo = new Rect (Screen.width-280,40,320,160);
 	Rect playerInfo = new Rect(0, 0, 160, 80);
 	
 	// We need to grab a reference to the isMoving variable in the javascript ThirdPersonController script
@@ -113,8 +113,8 @@ public class GraduallyUpdateState : MonoBehaviour {
 			bool match = false;
 			for (j=0; j<m_LocalStateCount-1; j++) {
 				if (m_BufferedState[0].timestamp <= m_LocalBufState[j].timestamp && m_LocalBufState[j].timestamp - m_BufferedState[0].timestamp <= m_TimeThreshold) {
-					//Debug.Log("Comparing state " + j + "localtime: " + m_LocalBufState[j].timestamp  + " networktime: " + m_BufferedState[0].timestamp);
-					//Debug.Log("Local: " + m_LocalBufState[j].pos + " Network: " + m_BufferedState[0].pos);
+					Debug.Log("Comparing state " + j + "localtime: " + m_LocalBufState[j].timestamp  + " networktime: " + m_BufferedState[0].timestamp);
+					Debug.Log("Local: " + m_LocalBufState[j].pos + " Network: " + m_BufferedState[0].pos);
 					m_TimeAccuracy = Mathf.Abs((float)m_LocalBufState[j].timestamp -(float)m_BufferedState[0].timestamp);
 					m_PredictionAccuracy = (Vector3.Distance(m_LocalBufState[j].pos,m_BufferedState[0].pos));
 					match = true;
@@ -331,7 +331,13 @@ public class GraduallyUpdateState : MonoBehaviour {
 			else
 			{
 				//FIX ME this locks unity client on disconnection from server
-				//spawnTracker.SendMessage("CleanUpPlayer", gameObject);
+				//Right now there is only one network view for this object, the transform network view.  
+				//In the future we could have many more so we would need to index by the proper one.
+				NetworkView[] netViews = gameObject.GetComponents<NetworkView>();
+				if( netViews.Length == 1)
+					spawnTracker.SendMessage("CleanUpPlayer", netViews[0].viewID);
+				else
+					Debug.Log("Could not find the network views.");
 			}
 		}
 		//Destroy(gameObject);

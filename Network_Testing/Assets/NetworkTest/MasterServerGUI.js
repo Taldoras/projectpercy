@@ -22,6 +22,8 @@ private var testMessage = "Undetermined NAT capabilities";
 private var runDedicated = false;
 private var directConnect = false;
 
+private var spawnTracker;
+
 // Enable this if not running a client on the server machine
 //MasterServer.dedicatedServer = true;
 
@@ -53,6 +55,11 @@ function Awake ()
 		Debug.Log("This machine has a public IP address");
 	else
 		Debug.Log("This machine has a private IP address");
+}
+
+function Start()
+{
+	spawnTracker = GameObject.Find("SpawnPoint");
 }
 
 function Update() {
@@ -252,6 +259,7 @@ function MakeWindow (id : int) {
 		{
 			Network.Disconnect();
 			MasterServer.UnregisterHost();
+			spawnTracker.SendMessage("CleanAllPlayers");
 		}
 		GUILayout.FlexibleSpace();
 	}
