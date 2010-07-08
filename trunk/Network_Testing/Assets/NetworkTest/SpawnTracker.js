@@ -8,7 +8,7 @@ private var isInstantiated : boolean = false;
 // The server uses this to track all intantiated player
 private var playerInfo : Array = new Array();
 
-private var scoreInfo : Rect = new Rect (0,Screen.height - 170,160,180);
+private var scoreInfo : Rect = new Rect (0,Screen.height - 170,320,180);
 
 class PlayerInfo {
 	var transformViewID : NetworkViewID;
@@ -69,6 +69,10 @@ function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : Networ
 		// Enable input network synchronization (server gets input)
 		instantiatedPlayer.GetComponent(NetworkController).enabled = true;
 		instantiatedPlayer.SendMessage("SetOwnership", playerIdentifier);
+		var camObj : GameObject = GameObject.FindWithTag("MainCamera");
+		var followCam : SmoothLookAt = camObj.GetComponent(SmoothLookAt);
+		followCam.target = instantiatedPlayer;
+		//followCam.DidChangeTarget(); //Call this to update target association (spring follow camera)
 		//return;
 	// Initialize player on server
 	//} else if (Network.isServer) {
@@ -118,31 +122,56 @@ function OnPlayerConnected (player : NetworkPlayer) {
 
 function OnPlayerDisconnected (player : NetworkPlayer) 
 {
-	cleanPlayer( player );
+	//Debug.Log("OnPlayerDisconnected called");
+	var playerInstance = getPlayer(player);
+	cleanPlayer(playerInstance);
 }
 
-function CleanUpPlayer(player : GameObject)
+function CleanUpPlayer(transformViewID : NetworkViewID)
 {
-	Debug.Log("CleanUpPlayer called");
-	netPlayer = player.GetComponent(NetworkPlayer);
-	cleanPlayer(netPlayer);
+	//Debug.Log("CleanUpPlayer called");
+	var playerInstance = getPlayer(transformViewID);
+	cleanPlayer(playerInstance);
 }
 
-function cleanPlayer( player : NetworkPlayer )
+function cleanPlayer( playerInstance : PlayerInfo )
 {
-	Debug.Log("Cleaning up player " + player);
+	if( playerInstance == null )
+		return;
+	//Debug.Log("Cleaning up player " + playerInstance.player);
 	// Destroy the player object this network player spawned
 	var deletePlayer : PlayerInfo;
-	for (var playerInstance : PlayerInfo in playerInfo) {
-		if (player == playerInstance.player) {
-			Debug.Log("Destroying objects belonging to view ID " + playerInstance.transformViewID);
-			Network.Destroy(playerInstance.transformViewID);
-			deletePlayer = playerInstance;
-		}
-	}
+
+	//Debug.Log("Destroying objects belonging to view ID " + playerInstance.transformViewID);
+	deletePlayer = playerInstance;
+	if(playerInstance.transformViewID == localTransformViewID)
+		isInstantiated = false;	
+
+	Network.RemoveRPCs(deletePlayer.player, 0);
+	Network.Destroy(playerInstance.transformViewID);
+	//Network.DestroyPlayerObjects(deletePlayer.player);
 	playerInfo.Remove(deletePlayer);
-	Network.RemoveRPCs(player, 0);
-	Network.DestroyPlayerObjects(player);
+	Debug.Log("playerInfo length is "+playerInfo.length);
+}
+
+function CleanAllPlayers()
+{
+	Debug.Log("Clean ALL players "+playerInfo.length);
+	
+	for(var playerInstance : PlayerInfo in playerInfo)
+	{
+		var deletePlayer : PlayerInfo;
+
+		//Debug.Log("Destroying objects belonging to view ID " + playerInstance.transformViewID);
+		deletePlayer = playerInstance;
+		if(playerInstance.transformViewID == localTransformViewID)
+			isInstantiated = false;	
+
+		Network.RemoveRPCs(deletePlayer.player, 0);
+		Network.Destroy(playerInstance.transformViewID);
+		//Network.DestroyPlayerObjects(deletePlayer.player);
+	}
+	playerInfo.length = 0;
 }
 
 function setPlayerScore(transformViewID : NetworkViewID, score : int)
@@ -175,6 +204,20 @@ function getPlayer(transformViewID : NetworkViewID)
 	for(var playerInstance : PlayerInfo in playerInfo)
 	{
 		if(playerInstance.transformViewID == transformViewID)
+		{
+			targetPlayer = playerInstance;
+		}
+	}	
+	
+	return targetPlayer;
+}
+
+function getPlayer(player : NetworkPlayer)
+{
+	var tagetPlayer : PlayerInfo = null;
+	for(var playerInstance : PlayerInfo in playerInfo)
+	{
+		if(playerInstance.player == player)
 		{
 			targetPlayer = playerInstance;
 		}
