@@ -22,21 +22,27 @@ public class GraduallyUpdateState : MonoBehaviour {
 	Component targetController;
 	FieldInfo isMovingFieldInfo;
 	
+	bool m_interpol = false;
+	bool m_extrapol = false;
+	
 	internal struct  State
 	{
 		internal double timestamp;
 		internal Vector3 pos;
 		internal Quaternion rot;
+		//internal Vector3 velocity;
+		//internal Vector3 angularVelocity;
 	}
 	// How far behind should server data be played back during remote player
 	// interpolation. The poorer the connection the higher this value needs to
 	// be. Fast connections should do fine with 0.1. The server latency
 	// affects this the most.
-	public double m_InterpolationBackTime = 0.1; 
-
+	public double m_InterpolationBackTime = 0.1; 	
+	public double m_ExtrapolationLimit = .75;
+	
 	// We store twenty states with "playback" information
 	State[] m_BufferedState = new State[20];
-	State[] m_LocalBufState = new State[20];
+
 	// Keep track of what slots are used
 	int m_TimestampCount;
 	int m_LocalStateCount;
@@ -53,8 +59,6 @@ public class GraduallyUpdateState : MonoBehaviour {
 	// Stat variabels for prediction stuff
 	float m_TimeAccuracy = 0;
 	float m_PredictionAccuracy = 0;
-	bool m_FixError = false;
-	Vector3 m_NewPosition;
 	
 	GameObject spawnTracker = null;		
 	
@@ -83,70 +87,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 			return (bool) isMovingFieldInfo.GetValue(targetController);
 		}
 	}
-	
-	IEnumerator MonitorLocalMovement() {
-		while (true) {
-			yield return new WaitForSeconds(1/15);
-			
-			// Shift buffer contents, oldest data erased, 18 becomes 19, ... , 0 becomes 1
-			for (int i=m_LocalBufState.Length-1;i>=1;i--)
-			{
-				m_LocalBufState[i] = m_LocalBufState[i-1];
-			}
-			
-			// Save currect received state as 0 in the buffer, safe to overwrite after shifting
-			State state;
-			state.timestamp = Network.time;
-			state.pos = transform.position;
-			state.rot = transform.rotation;
-			m_LocalBufState[0] = state;
-			
-			// Increment state count but never exceed buffer size
-			m_LocalStateCount = Mathf.Min(m_LocalStateCount + 1, m_LocalBufState.Length);
-			
-			//
-			// Check if the client side prediction has an error
-			//
-			
-			// Find the local buffered state which is closest to network state in time
-			int j = 0;
-			bool match = false;
-			for (j=0; j<m_LocalStateCount-1; j++) {
-				if (m_BufferedState[0].timestamp <= m_LocalBufState[j].timestamp && m_LocalBufState[j].timestamp - m_BufferedState[0].timestamp <= m_TimeThreshold) {
-					Debug.Log("Comparing state " + j + "localtime: " + m_LocalBufState[j].timestamp  + " networktime: " + m_BufferedState[0].timestamp);
-					Debug.Log("Local: " + m_LocalBufState[j].pos + " Network: " + m_BufferedState[0].pos);
-					m_TimeAccuracy = Mathf.Abs((float)m_LocalBufState[j].timestamp -(float)m_BufferedState[0].timestamp);
-					m_PredictionAccuracy = (Vector3.Distance(m_LocalBufState[j].pos,m_BufferedState[0].pos));
-					match = true;
-					break;
-				}
-			}
-			if (!match) { 
-				//Debug.Log("No match!");
-			}
-			// If prediction is off, diverge current location by the amount of the offset
-			else if (m_PredictionAccuracy > m_PredictionThreshold) {
-				//Debug.Log("Error in prediction("+m_PredictionAccuracy+"), local is " + m_LocalBufState[j].pos + " network is " + m_BufferedState[0].pos);
-				//Debug.Log("Local time: " + m_LocalBufState[j].timestamp + " Network time: " + m_BufferedState[0].timestamp);
-				
-				// Find how far we travelled since the prediction failed
-				Vector3 localMovement = m_LocalBufState[j].pos - m_LocalBufState[0].pos;
-				
-				// "Erase" old values in the local buffer
-				m_LocalStateCount = 1;
 
-				// New position which we need to converge to in the update loop				
-				m_NewPosition = m_BufferedState[0].pos + localMovement;
-
-				// Trigger the new position convergence routine				
-				m_FixError = true;
-				
-			} else {
-				m_FixError = false;
-			}
-		}
-	}
-	
 	void OnGUI() 
 	{
 		if (m_IsMine) 
@@ -161,7 +102,14 @@ public class GraduallyUpdateState : MonoBehaviour {
 	
 	void MakeNetPlayerInfoWindow(int windowID)
 	{
-		GUILayout.Label(string.Format("Latest Pos: {0},{1},{2}", m_BufferedState[0].pos.x,m_BufferedState[0].pos.y,m_BufferedState[0].pos.z));
+		GUILayout.Label(string.Format("Buffer Latest Pos: {0},{1},{2}", m_BufferedState[0].pos.x,m_BufferedState[0].pos.y,m_BufferedState[0].pos.z));
+		GUILayout.Label(string.Format("Buffer Latest Rot: {0},{1},{2}", m_BufferedState[0].rot.x,m_BufferedState[0].rot.y,m_BufferedState[0].rot.z));
+		GUILayout.Label(string.Format("Message count: {0}", m_MsgCounter));
+		GUILayout.Label(string.Format("Object Latest Pos: {0},{1},{2}", transform.position.x,transform.position.y,transform.position.z));
+		GUILayout.Label(string.Format("Object Latest Rot: {0},{1},{2}", transform.rotation.x,transform.rotation.y,transform.rotation.z));
+		GUILayout.Label(string.Format("Interpolating: {0}", m_interpol));
+		GUILayout.Label(string.Format("Extrapolating: {0}", m_extrapol));
+	
 	}
 	
 	void MakeConnInfoWindow(int windowID) 
@@ -182,8 +130,8 @@ public class GraduallyUpdateState : MonoBehaviour {
 			}
 			m_MsgLatencyTotal = 0;
 		}
-		GUILayout.Label(string.Format("Fix Error : {0}", m_FixError));
-		GUILayout.Label(string.Format("Latest Pos: {0},{1},{2}", m_BufferedState[0].pos.x,m_BufferedState[0].pos.y,m_BufferedState[0].pos.z));
+		GUILayout.Label(string.Format("Latest Pos: {0},{1},{2}", transform.position.x,transform.position.y,transform.position.z));
+		GUILayout.Label(string.Format("Latest Rot: {0},{1},{2}", transform.rotation.x,transform.rotation.y,transform.rotation.z));
 	}
 	
 	// The network sync routine makes sure m_BufferedState always contains the last 20 updates
@@ -200,7 +148,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 		}
 		// When receiving, buffer the information
 		else
-		{
+		{		
 			m_MsgCounter++;
 			m_MsgLatencyTotal += (Network.time-info.timestamp);
 			
@@ -241,7 +189,6 @@ public class GraduallyUpdateState : MonoBehaviour {
 	{
 		Debug.Log("Setting ownership for local player");
 		m_IsMine = true;
-		StartCoroutine(MonitorLocalMovement());
 	}
 	
 	// This only runs where the component is enabled, which is only on remote peers (server/clients)
@@ -249,63 +196,52 @@ public class GraduallyUpdateState : MonoBehaviour {
 	{
 		double currentTime = Network.time;
 		double interpolationTime = currentTime - m_InterpolationBackTime;
+		
 		// We have a window of interpolationBackTime where we basically play 
 		// By having interpolationBackTime the average ping, you will usually use interpolation.
 		// And only if no more data arrives we will use extrapolation
-		
-		// If this is my player interpolate server position with the position set by me
-		if (m_IsMine && m_FixError) {
-			Vector3 difference = m_NewPosition - transform.position;			
-			// This is a cheap method for interpolating server and client positions. The higher
-			// the difference the closer to the client state we will go. This is to minimize big jumps
-			// in the movment. This can be done differenctly, like for example just doing 50/50 server
-			// and client position.
-			transform.position = Vector3.Lerp(m_NewPosition, transform.position, difference.magnitude);
-		// If we are not moving converge to the 100% accurate server position
-		} else if (m_IsMine && !targetIsMoving) {			
-			transform.position = Vector3.Lerp(m_BufferedState[0].pos, transform.position, 0.95F);
-		// Use interpolation for other remote clients
-		} else if (Network.isClient && !m_IsMine) {
-			// Use interpolation
-			// Check if latest state exceeds interpolation time, if this is the case then
-			// it is too old and extrapolation should be used
-			if (m_BufferedState[0].timestamp > interpolationTime)
+		m_interpol = m_BufferedState[0].timestamp > interpolationTime;
+		 if (m_BufferedState[0].timestamp > interpolationTime)
+		{
+			for (int i = 0; i < m_TimestampCount ; i++)
 			{
-				for (int i=0;i<m_TimestampCount;i++)
+				// Find the state which matches the interpolation time (time+0.1) or use last state
+				if (m_BufferedState[i].timestamp <= interpolationTime || i == m_TimestampCount-1)
 				{
-					// Find the state which matches the interpolation time (time+0.1) or use last state
-					if (m_BufferedState[i].timestamp <= interpolationTime || i == m_TimestampCount-1)
-					{
-						// The state one slot newer (<100ms) than the best playback state
-						State rhs = m_BufferedState[Mathf.Max(i-1, 0)];
-						// The best playback state (closest to 100 ms old (default time))
-						State lhs = m_BufferedState[i];
-						
-						// Use the time between the two slots to determine if interpolation is necessary
-						double length = rhs.timestamp - lhs.timestamp;
-						float t = 0.0F;
-						// As the time difference gets closer to 100 ms t gets closer to 1 in 
-						// which case rhs is only used
-						if (length > 0.0001)
-							t = (float)((interpolationTime - lhs.timestamp) / length);
-						
-						// if t=0 => lhs is used directly
-						transform.position = Vector3.Lerp(lhs.pos, rhs.pos, t);
-						transform.rotation = Quaternion.Slerp(lhs.rot, rhs.rot, t);
-						//m_InterpolationTime = (Network.time - m_BufferedState[i].timestamp)*1000;
-						return;
-					}
+					// The state one slot newer (<100ms) than the best playback state
+					State rhs = m_BufferedState[Mathf.Max(i-1, 0)];
+					// The best playback state (closest to 100 ms old (default time))
+					State lhs = m_BufferedState[i];
+					
+					// Use the time between the two slots to determine if interpolation is necessary
+					double length = rhs.timestamp - lhs.timestamp;
+					float t = 0.0F;
+					// As the time difference gets closer to 100 ms t gets closer to 1 in 
+					// which case rhs is only used
+					if (length > 0.0001)
+						t = (float)((interpolationTime - lhs.timestamp) / length);
+					
+					// if t=0 => lhs is used directly
+					transform.position = Vector3.Lerp(lhs.pos, rhs.pos, t);
+					transform.rotation = Quaternion.Slerp(lhs.rot, rhs.rot, t);
+					//m_InterpolationTime = (Network.time - m_BufferedState[i].timestamp)*1000;
+					return;
 				}
 			}
-			// Use extrapolation. Here we do something really simple and just repeat the last
-			// received state. You can do clever stuff with predicting what should happen.
-			else
+		}
+		// Use extrapolation. Here we do something really simple and just repeat the last
+		// received state. You can do clever stuff with predicting what should happen.
+		else
+		{
+			State latest = m_BufferedState[0];
+			
+			float extrapolationLength = (float)(interpolationTime - latest.timestamp);
+			m_extrapol = extrapolationLength < m_ExtrapolationLimit;
+			// Don't extrapolation for more than 500 ms, you would need to do that carefully
+			if (extrapolationLength < m_ExtrapolationLimit)
 			{
-				State latest = m_BufferedState[0];
-				
-				transform.localPosition = latest.pos;
-				transform.localRotation = latest.rot;
-				//Debug.Log("Extrapolating " + latest.pos);
+				transform.position = latest.pos;
+				transform.rotation = latest.rot;
 			}
 		}
 	}
@@ -330,7 +266,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 			}
 			else
 			{
-				//FIX ME this locks unity client on disconnection from server
+
 				//Right now there is only one network view for this object, the transform network view.  
 				//In the future we could have many more so we would need to index by the proper one.
 				NetworkView[] netViews = gameObject.GetComponents<NetworkView>();
