@@ -19,14 +19,18 @@ class PlayerInfo {
 }
 
 function OnGUI () {
-	if (Network.isClient && localPlayer.ToString() != 0 && !isInstantiated) 
-		if (GUI.Button(new Rect(20,Screen.height-60, 90, 20),"SpawnPlayer"))
+	if(Network.isClient || (Network.isServer && !MasterServer.dedicatedServer))
+	{
+		if (localPlayer.ToString() != 0 && !isInstantiated) 
 		{
-			// Spawn the player on all machines
-			networkView.RPC("SpawnPlayer", RPCMode.AllBuffered, localPlayer, localTransformViewID);//, localAnimationViewID);
-			isInstantiated = true;
-		}
-		
+			if (GUI.Button(new Rect(20,Screen.height-60, 90, 20),"SpawnPlayer"))
+			{
+				// Spawn the player on all machines
+				networkView.RPC("SpawnPlayer", RPCMode.AllBuffered, localPlayer, localTransformViewID);//, localAnimationViewID);
+				isInstantiated = true;
+			}
+		}	
+	}
 	scoreInfo = GUILayout.Window(2, scoreInfo, ScoreWindow, "Scores");		
 }
 
@@ -44,7 +48,8 @@ function InitPlayer (player : NetworkPlayer, tViewID : NetworkViewID){//, aViewI
 // Create a networked player in the game. Instantiate a local copy of the player, set the view IDs
 // accordingly. 
 @RPC
-function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : NetworkViewID){//, animationViewID : NetworkViewID) {
+function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : NetworkViewID)//, animationViewID : NetworkViewID) {
+{
 	Debug.Log("Instantiating player " + playerIdentifier);
 	var instantiatedPlayer : Transform = Instantiate(playerPrefab, transform.position, transform.rotation);
 	var networkViews = instantiatedPlayer.GetComponents(NetworkView);
@@ -53,29 +58,15 @@ function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : Networ
 	instantiatedPlayer.GetComponent (ThirdPersonStatus).setPlayerID(transformViewID);
 	
 	// Assign view IDs to player object
-	if (networkViews.Length != 1) {
+	if (networkViews.Length != 1) 
+	{
 		Debug.Log("Error while spawning player, prefab should have 1 network views, has "+networkViews.Length);
 		return;
-	} else {
+	} 
+	else 
+	{
 		networkViews[0].viewID = transformViewID;
 		//networkViews[1].viewID = animationViewID;
-	}
-	// Initialize local player
-	if (playerIdentifier == localPlayer) {
-		Debug.Log("Enabling user input as this is the local player");
-		// W are doing client prediction and thus enable the controller script + user input processing
-		//instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
-		instantiatedPlayer.GetComponent(ThirdPersonController).getUserInput = true;
-		// Enable input network synchronization (server gets input)
-		instantiatedPlayer.GetComponent(NetworkController).enabled = true;
-		instantiatedPlayer.SendMessage("SetOwnership", playerIdentifier);
-		var camObj : GameObject = GameObject.FindWithTag("MainCamera");
-		var followCam : SmoothLookAt = camObj.GetComponent(SmoothLookAt);
-		followCam.target = instantiatedPlayer;
-		//followCam.DidChangeTarget(); //Call this to update target association (spring follow camera)
-		//return;
-	// Initialize player on server
-	//} else if (Network.isServer) {
 	}
 	
 	instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
@@ -87,6 +78,27 @@ function SpawnPlayer (playerIdentifier : NetworkPlayer, transformViewID : Networ
 	playerInstance.player = playerIdentifier;
 	Debug.Log("playerId (transformViewID): "+playerInstance.transformViewID); 
 	playerInfo.Add(playerInstance);
+		
+	// Initialize local player
+	if (playerIdentifier == localPlayer) 
+	{
+		Debug.Log("Enabling user input as this is the local player");
+		// W are doing client prediction and thus enable the controller script + user input processing
+		//instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
+		instantiatedPlayer.GetComponent(ThirdPersonController).getUserInput = true;
+		// Enable input network synchronization (server gets input)
+		instantiatedPlayer.GetComponent(NetworkController).enabled = true;
+		instantiatedPlayer.SendMessage("SetOwnership", playerIdentifier);
+		var camObj : GameObject = GameObject.FindWithTag("MainCamera");
+		var followCam : SmoothLookAt = camObj.GetComponent(SmoothLookAt);
+		followCam.target = instantiatedPlayer;
+		//followCam.DidChangeTarget(); //Call this to update target association (spring follow camera)
+	}
+	else
+	{
+		//instantiatedPlayer.name += "Remote";
+	}
+	
 	Debug.Log("There are now " + playerInfo.length + " players active");
 	
 }

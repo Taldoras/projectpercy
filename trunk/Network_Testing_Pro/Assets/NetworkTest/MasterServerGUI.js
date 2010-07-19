@@ -1,6 +1,6 @@
 DontDestroyOnLoad(this);
 
-var gameName = "Sumo Showdown";
+var gameName = "Sumo Cats";
 var serverPort = 25002;
 
 var directIP = "127.0.0.1";
@@ -134,14 +134,15 @@ function TestConnection() {
 		default: 
 			testMessage = "Error in test routine, got " + natCapable;
 	}
-	Debug.Log(natCapable + " " + probingPublicIP + " " + doneTesting);
+	//Debug.Log(natCapable + " " + probingPublicIP + " " + doneTesting);
 }
 
 function MakeWindow (id : int) {
 	
 	hideTest = GUILayout.Toggle(hideTest, "Hide test info");
 	directConnect = GUILayout.Toggle(directConnect, "Direct Connect");
-	
+	runDedicated = GUILayout.Toggle(runDedicated, "Run as dedicated");
+		
 	if (!hideTest) {
 		GUILayout.Label(testMessage);
 		if (GUILayout.Button ("Retest connection"))
@@ -160,13 +161,7 @@ function MakeWindow (id : int) {
 	{
 		//Debug.Log("disconn type is "+NetworkPeerType.Disconnected);
 		GUILayout.BeginHorizontal();
-		// Start a new server
-		if (GUILayout.Button ("Start Server"))
-		{
-			Network.InitializeServer(32, serverPort);
-			MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
-		}
-		runDedicated = GUILayout.Toggle(runDedicated, "Run as dedicated");
+
 		if(runDedicated)
 		{
 			MasterServer.dedicatedServer = true;
@@ -175,6 +170,13 @@ function MakeWindow (id : int) {
 		{
 			MasterServer.dedicatedServer = false;		
 		}
+		
+		// Start a new server
+		if (GUILayout.Button ("Start Server"))
+		{
+			Network.InitializeServer(32, serverPort);
+			MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
+		}		
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 		
@@ -247,8 +249,11 @@ function MakeWindow (id : int) {
 		{
 				if (GUILayout.Button("Connect"))
 				{
+					Network.useNat = false; //We know address of machine and dont need NAT
+					var info: NetworkConnectionError;
 					Debug.Log("Attempting connection to "+directIP+":"+directPort);
-					Network.Connect(directIP, parseInt(directPort));
+					info = Network.Connect(directIP, parseInt(directPort));
+					Debug.Log("Direct connect result: "+info);
 				}				
 		}
 			
@@ -261,6 +266,13 @@ function MakeWindow (id : int) {
 			MasterServer.UnregisterHost();
 			spawnTracker.SendMessage("CleanAllPlayers");
 		}
+		if(Network.isServer && !MasterServer.dedicatedServer)
+		{
+			if(GUILayout.Button("Connect to Local Server"))
+			{
+				Network.Connect(directIP, parseInt(directPort));
+			}
+		}	
 		GUILayout.FlexibleSpace();
 	}
 	GUI.DragWindow (Rect (0,0,1000,1000));

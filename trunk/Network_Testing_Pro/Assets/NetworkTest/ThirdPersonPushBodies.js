@@ -1,4 +1,4 @@
-var pushPower = 0.5;
+var pushPower = 3;
 var pushLayers : LayerMask = -1;
 private var controller : ThirdPersonController;
 
@@ -41,7 +41,7 @@ function OnControllerColliderHit (hit : ControllerColliderHit)
 		
 		// Calculate push direction from move direction, we only push objects to the sides
 		// never up and down
-		var pushDir = Vector3 (hit.moveDirection.x, 0, hit.moveDirection.z);
+		var pushDir = Vector3 (hit.moveDirection.x, 0.5, hit.moveDirection.z);
 		
 		// push with move speed but never more than walkspeed
 		var controller = hit.collider.gameObject.GetComponent(CharacterController);
