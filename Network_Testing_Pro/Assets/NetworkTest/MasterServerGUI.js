@@ -268,10 +268,12 @@ function MakeWindow (id : int) {
 		}
 		if(Network.isServer && !MasterServer.dedicatedServer)
 		{
+		/*
 			if(GUILayout.Button("Connect to Local Server"))
 			{
 				Network.Connect(directIP, parseInt(directPort));
 			}
+			*/
 		}	
 		GUILayout.FlexibleSpace();
 	}

@@ -71,6 +71,8 @@ private var lastGroundedTime = 0.0;
 
 private var lean = 0.0;
 
+private var slammed = false;
+
 // The vertical/horizontal input axes and jump button from user input, synchronized over network
 public var verticalInput : float;
 public var horizontalInput : float;
@@ -335,15 +337,25 @@ function Update() {
 	// Set rotation to the move direction
 	if (IsGrounded() && moveDirection != Vector3.zero)
 	{
+		if(slammed) // we got knocked over by an enemy. We need to reset some stuff
+		{
+			slammed = false;
+			controller.height = 2;
+			transform.position.y += 0.75;
+		}
+	
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 	}	
 	else
 	{
-		var xzMove = movement;
-		xzMove.y = 0;
-		if (xzMove.magnitude > 0.001)
-		{
-			transform.rotation = Quaternion.LookRotation(xzMove);
+		if(!slammed)
+		{		
+			var xzMove = movement;
+			xzMove.y = 0;
+			if (xzMove.magnitude > 0.001)
+			{
+				transform.rotation = Quaternion.LookRotation(xzMove);
+			}
 		}
 	}	
 	
@@ -373,7 +385,7 @@ function GetSpeed () {
 }
 
 function IsJumping () {
-	return jumping;
+	return jumping && !slammed;
 }
 
 function IsGrounded () {
@@ -396,6 +408,18 @@ function SuperJump (height : float, jumpVelocity : Vector3)
 	DidJump();
 }
 
+function Slam (direction : Vector3)
+{
+	verticalSpeed = CalculateJumpVerticalSpeed (1);
+	inAirVelocity = direction * 3;
+	direction.y = 0.6;
+	Quaternion.LookRotation(-direction);
+	var controller : CharacterController = GetComponent(CharacterController);
+	controller.height = 0.5;
+	slammed = true;
+	collisionFlags = CollisionFlags.None;
+	SendMessage("DidJump", SendMessageOptions.DontRequireReceiver);
+}
 
 function GetDirection () {
 	return moveDirection;

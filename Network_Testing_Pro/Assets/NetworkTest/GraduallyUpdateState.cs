@@ -21,6 +21,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 	
 	Component targetController;
 	FieldInfo isMovingFieldInfo;
+	CharacterController characterController;
 	
 	bool m_interpol = false;
 	bool m_extrapol = false;
@@ -38,7 +39,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 	// be. Fast connections should do fine with 0.1. The server latency
 	// affects this the most.
 	public double m_InterpolationBackTime = 0.1; 	
-	public double m_ExtrapolationLimit = .75;
+	public double m_ExtrapolationLimit = .5;
 	
 	// We store twenty states with "playback" information
 	State[] m_BufferedState = new State[20];
@@ -75,14 +76,18 @@ public class GraduallyUpdateState : MonoBehaviour {
 	Rect playerInfo = new Rect(0, 0, 160, 80);
 	
 	// We need to grab a reference to the isMoving variable in the javascript ThirdPersonController script
-	void Start() {
+	void Start() 
+	{
+		
 		targetController = GetComponent("ThirdPersonController");
 		isMovingFieldInfo=targetController.GetType().GetField("isMoving");
 		spawnTracker = GameObject.Find("SpawnPoint");
+		//characterController = GetComponent("CharacterController");
 	}
 	
 	// Convert field info from character controller script to a local bool variable
-	bool targetIsMoving {
+	bool targetIsMoving 
+	{
 		get {
 			return (bool) isMovingFieldInfo.GetValue(targetController);
 		}
@@ -105,8 +110,8 @@ public class GraduallyUpdateState : MonoBehaviour {
 		GUILayout.Label(string.Format("Buffer Latest Pos: {0},{1},{2}", m_BufferedState[0].pos.x,m_BufferedState[0].pos.y,m_BufferedState[0].pos.z));
 		GUILayout.Label(string.Format("Buffer Latest Rot: {0},{1},{2}", m_BufferedState[0].rot.x,m_BufferedState[0].rot.y,m_BufferedState[0].rot.z));
 		GUILayout.Label(string.Format("Message count: {0}", m_MsgCounter));
-		GUILayout.Label(string.Format("Object Latest Pos: {0},{1},{2}", transform.position.x,transform.position.y,transform.position.z));
-		GUILayout.Label(string.Format("Object Latest Rot: {0},{1},{2}", transform.rotation.x,transform.rotation.y,transform.rotation.z));
+		GUILayout.Label(string.Format("Transform Latest Pos: {0},{1},{2}", transform.position.x,transform.position.y,transform.position.z));
+		GUILayout.Label(string.Format("Transform Latest Rot: {0},{1},{2}", transform.rotation.x,transform.rotation.y,transform.rotation.z));
 		GUILayout.Label(string.Format("Interpolating: {0}", m_interpol));
 		GUILayout.Label(string.Format("Extrapolating: {0}", m_extrapol));
 	
@@ -141,10 +146,12 @@ public class GraduallyUpdateState : MonoBehaviour {
 		// Always send transform (depending on reliability of the network view)
 		if (stream.isWriting)
 		{
+			
 			Vector3 pos = transform.position;
 			Quaternion rot = transform.rotation;
 			stream.Serialize(ref pos);
 			stream.Serialize(ref rot);
+			
 		}
 		// When receiving, buffer the information
 		else
@@ -153,11 +160,12 @@ public class GraduallyUpdateState : MonoBehaviour {
 			m_MsgLatencyTotal += (Network.time-info.timestamp);
 			
 			// Receive latest state information
+			
 			Vector3 pos = Vector3.zero;
 			Quaternion rot = transform.rotation;//Quaternion.identity;
 			stream.Serialize(ref pos);
 			stream.Serialize(ref rot);
-			
+						
 			// Shift buffer contents, oldest data erased, 18 becomes 19, ... , 0 becomes 1
 			for (int i=m_BufferedState.Length-1;i>=1;i--)
 			{
@@ -169,6 +177,8 @@ public class GraduallyUpdateState : MonoBehaviour {
 			state.timestamp = info.timestamp;
 			state.pos = pos;
 			state.rot = rot;
+			//state.velocity = velocity;
+			//state.angularVelocity = angularVelocity;			
 			m_BufferedState[0] = state;
 			
 			// Increment state count but never exceed buffer size
@@ -222,8 +232,8 @@ public class GraduallyUpdateState : MonoBehaviour {
 						t = (float)((interpolationTime - lhs.timestamp) / length);
 					
 					// if t=0 => lhs is used directly
-					transform.position = Vector3.Lerp(lhs.pos, rhs.pos, t);
-					transform.rotation = Quaternion.Slerp(lhs.rot, rhs.rot, t);
+					transform.localPosition = Vector3.Lerp(lhs.pos, rhs.pos, t);
+					transform.localRotation = Quaternion.Slerp(lhs.rot, rhs.rot, t);
 					//m_InterpolationTime = (Network.time - m_BufferedState[i].timestamp)*1000;
 					return;
 				}
@@ -240,8 +250,10 @@ public class GraduallyUpdateState : MonoBehaviour {
 			// Don't extrapolation for more than 500 ms, you would need to do that carefully
 			if (extrapolationLength < m_ExtrapolationLimit)
 			{
+				
 				transform.position = latest.pos;
 				transform.rotation = latest.rot;
+				
 			}
 		}
 	}
