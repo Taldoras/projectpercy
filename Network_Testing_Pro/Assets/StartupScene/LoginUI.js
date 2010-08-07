@@ -33,8 +33,7 @@ function OnGUI () {
 
 }
 
-function showStart()
-{
+function showStart() {
 	if(GUI.Button( Rect(20,30,100,20), "Logout")) 
 	{
 		loggedin = false;	
@@ -58,7 +57,7 @@ function showLogin() {
 
 	// password
 	GUI.SetNextControlName ("txtPassword");
-	password = GUI.TextField( Rect(20,40,100,20), password); 
+	password = GUI.PasswordField( Rect(20,40,100,20), password,  "*"[0]); 
 	
 	// login button
 	if(GUI.Button( Rect(20,70,100,20), "Login")) 
