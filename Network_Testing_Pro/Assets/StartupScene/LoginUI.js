@@ -52,8 +52,6 @@ function showStart()
 function showLogin() {
 	//print("Showing login");
 	
-	//GUI.Box (Rect (Screen.width/2 - 75,Screen.height/2 - 200,150,300), "Main Menu");
-	
 	// the users name
 	 GUI.SetNextControlName ("txtUserName");
 	userName = GUI.TextField(Rect(20,10,100,20), userName); 
@@ -143,21 +141,10 @@ function clearFields() {
 	{
 		userName = "";
 	}
-	else 
-	{
-		print("else!");
-		userName = userNamePrime;
-	}
-
 	
 	if( (GUI.GetNameOfFocusedControl ()  == "txtPassword") &&	(password == "password") )
 	{
-		print("password focus");
 		password = "";
-	}
-	else
-	{
-		password = passwordPrime;
 	}
 		
 }
