@@ -1,13 +1,5 @@
 DontDestroyOnLoad(this);
 
-var userName = "Monster";
-var userId = 1111;
-var color = "red";
-
-function UserState () {
-}
-
-function getUserState()
-{
-	//return this.userName;
-}
+var userName = "";
+var userId = "";
+var color = "";

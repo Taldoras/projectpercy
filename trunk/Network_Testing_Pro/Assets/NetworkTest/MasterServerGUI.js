@@ -1,5 +1,9 @@
 // DontDestroyOnLoad(this);
 
+var gState : GlobalState;
+gState = GameObject.Find("GlobalState").GetComponent(GlobalState);
+
+
 var gameName = "Sumo Cats";
 var serverPort = 25002;
 
@@ -41,7 +45,9 @@ function OnFailedToConnect(info: NetworkConnectionError)
 
 function OnGUI ()
 {
-	windowRect = GUILayout.Window (0, windowRect, MakeWindow, "Network Controls");
+	var menuName = "Welcome " + gState.userName;
+	
+	windowRect = GUILayout.Window (0, windowRect, MakeWindow, menuName);
 }
 
 function Awake ()

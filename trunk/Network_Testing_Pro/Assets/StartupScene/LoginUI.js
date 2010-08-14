@@ -6,12 +6,16 @@ var userName = userNamePrime;
 var password = passwordPrime;
 var loginStatus = "";
 var loggedin = false;
+var welcomeMessage = "";
 
 var loginUrl="https://pp.lvlys.com/login/login/login-game.aspx?"; 	
 var createAccountUrl="https://pp.lvlys.com/login/login/createAccount-game.aspx?"; 	
 
 // gui stuff
 var windowRect = Rect(20, 200, 200, 400);
+
+// state stuff
+var gState : GlobalState;
 	
 function Start() {
 
@@ -45,6 +49,8 @@ function showStart() {
 		Application.LoadLevel("Scene1");
 	}	
 		
+	GUI.SetNextControlName ("lblWelcome");	
+	GUI.Label(Rect(20, 130, 100, 20), welcomeMessage);
 
 }
 	
@@ -94,7 +100,14 @@ function postLogin(userName, password) {
 	{
 		print("Login Successful!");
 		loggedin = true;
+		
+		// TEMPORARY TEST
+		updateWelcome();
+		
+		
 		showStartGame();
+		
+		
 	}
 	else
 	{
@@ -150,4 +163,10 @@ function clearFields() {
 
 function showStartGame() {
 
+}
+
+
+function updateWelcome() {
+	gState.userName = userName;
+	welcomeMessage = "Welcome " + gState.userName + "!" ;	 
 }
