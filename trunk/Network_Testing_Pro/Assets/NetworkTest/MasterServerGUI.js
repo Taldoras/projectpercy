@@ -1,4 +1,4 @@
-DontDestroyOnLoad(this);
+// DontDestroyOnLoad(this);
 
 var gameName = "Sumo Cats";
 var serverPort = 25002;
