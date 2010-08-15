@@ -5,10 +5,14 @@ gState = GameObject.Find("GlobalState").GetComponent(GlobalState);
 
 
 var gameName = "Sumo Cats";
-var serverPort = 25002;
 
-var directIP = "127.0.0.1";
-var directPort = "25002";
+var listenPort = 25000;
+var strListenPort = "25000";
+
+var remotePort = 25001;
+var strRemotePort = "25001";
+
+var remoteIP = "127.0.0.1";
 
 private var timeoutHostList = 0.0;
 private var lastHostListRequest = -1000.0;
@@ -26,7 +30,7 @@ private var testMessage = "Undetermined NAT capabilities";
 private var runDedicated = false;
 private var directConnect = false;
 
-private var spawnTracker;
+private var spawnTracker : SpawnTracker;
 
 // Enable this if not running a client on the server machine
 //MasterServer.dedicatedServer = true;
@@ -65,7 +69,7 @@ function Awake ()
 
 function Start()
 {
-	spawnTracker = GameObject.Find("SpawnPoint");
+	spawnTracker = GameObject.Find("SpawnPoint").GetComponent(SpawnTracker);
 }
 
 function Update() {
@@ -98,7 +102,7 @@ function TestConnection() {
 			
 		case ConnectionTesterStatus.PrivateIPHasNATPunchThrough:
 			if (probingPublicIP)
-				testMessage = "Non-connectable public IP address (port "+ serverPort +" blocked), NAT punchthrough can circumvent the firewall.";
+				testMessage = "Non-connectable public IP address (port "+ listenPort +" blocked), NAT punchthrough can circumvent the firewall.";
 			else
 				testMessage = "NAT punchthrough capable. Enabling NAT punchthrough functionality.";
 			// NAT functionality is enabled in case a server is started,
@@ -116,7 +120,7 @@ function TestConnection() {
 		// This case is a bit special as we now need to check if we can 
 		// cicrumvent the blocking by using NAT punchthrough
 		case ConnectionTesterStatus.PublicIPPortBlocked:
-			testMessage = "Non-connectble public IP address (port " + serverPort +" blocked), running a server is impossible.";
+			testMessage = "Non-connectble public IP address (port " + listenPort +" blocked), running a server is impossible.";
 			Network.useNat = false;
 			// If no NAT punchthrough test has been performed on this public IP, force a test
 			if (!probingPublicIP)
@@ -143,7 +147,9 @@ function TestConnection() {
 	//Debug.Log(natCapable + " " + probingPublicIP + " " + doneTesting);
 }
 
-function MakeWindow (id : int) {
+function MakeWindow (id : int) 
+{
+	var info: NetworkConnectionError;
 	
 	hideTest = GUILayout.Toggle(hideTest, "Hide test info");
 	directConnect = GUILayout.Toggle(directConnect, "Direct Connect");
@@ -160,8 +166,8 @@ function MakeWindow (id : int) {
 		}
 	}
 
-	directIP = GUILayout.TextField(directIP, 25);
-	directPort = GUILayout.TextField(directPort,10);
+	remoteIP = GUILayout.TextField(remoteIP, 25);
+	strListenPort = GUILayout.TextField(strListenPort,10);
 
 	if (Network.peerType == NetworkPeerType.Disconnected)
 	{
@@ -180,9 +186,10 @@ function MakeWindow (id : int) {
 		// Start a new server
 		if (GUILayout.Button ("Start Server"))
 		{
-			Network.InitializeServer(32, serverPort);
+			Network.InitializeServer(32, listenPort);
 			MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
 		}		
+		
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 		
@@ -253,14 +260,13 @@ function MakeWindow (id : int) {
 		}
 		else
 		{
-				if (GUILayout.Button("Connect"))
-				{
-					Network.useNat = false; //We know address of machine and dont need NAT
-					var info: NetworkConnectionError;
-					Debug.Log("Attempting connection to "+directIP+":"+directPort);
-					info = Network.Connect(directIP, parseInt(directPort));
-					Debug.Log("Direct connect result: "+info);
-				}				
+			if (GUILayout.Button("Connect"))
+			{
+				Network.useNat = false; //We know address of machine and dont need NAT
+				Debug.Log("Attempting connection to "+remoteIP+":"+strListenPort);
+				info = Network.Connect(remoteIP, parseInt(strListenPort));
+				Debug.Log("Direct connect result: "+info);
+			}				
 		}
 			
 	}
@@ -272,15 +278,17 @@ function MakeWindow (id : int) {
 			MasterServer.UnregisterHost();
 			spawnTracker.SendMessage("CleanAllPlayers");
 		}
+		
 		if(Network.isServer && !MasterServer.dedicatedServer)
 		{
-		/*
 			if(GUILayout.Button("Connect to Local Server"))
 			{
-				Network.Connect(directIP, parseInt(directPort));
+				//	networkView.RPC("InitPlayer", player, player, transformViewID, animationViewID);
+				var transformViewID : NetworkViewID = spawnTracker.InitServerPlayer();
+				spawnTracker.SpawnServerPlayer(transformViewID);
 			}
-			*/
 		}	
+		
 		GUILayout.FlexibleSpace();
 	}
 	GUI.DragWindow (Rect (0,0,1000,1000));

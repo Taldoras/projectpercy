@@ -257,7 +257,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 			}
 		}
 	}
-
+/*
 	void OnDisconnectedFromServer(NetworkDisconnection info)  
 	{
 		if (Network.isServer)
@@ -290,4 +290,5 @@ public class GraduallyUpdateState : MonoBehaviour {
 		}
 		//Destroy(gameObject);
 	}
+*/	
 }
