@@ -411,7 +411,7 @@ function SuperJump (height : float, jumpVelocity : Vector3)
 function Slam (direction : Vector3)
 {
 	verticalSpeed = CalculateJumpVerticalSpeed (1);
-	inAirVelocity = direction * 3;
+	inAirVelocity = direction * 4;
 	direction.y = 0.6;
 	Quaternion.LookRotation(-direction);
 	var controller : CharacterController = GetComponent(CharacterController);
