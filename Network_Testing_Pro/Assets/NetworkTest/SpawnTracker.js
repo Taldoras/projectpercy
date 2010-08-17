@@ -2,7 +2,6 @@ var playerPrefab : Transform;
 var test:boolean = false;
 // Local player information when one is instantiated
 private var initialized : boolean  = false;
-private var localPlayer : NetworkPlayer;
 private var localTransformViewID : NetworkViewID;
 //private var localAnimationViewID : NetworkViewID;
 private var isInstantiated : boolean = false;
@@ -255,6 +254,16 @@ function SpawnServerPlayer(transformViewID)
 	isInstantiated = true;	
 }
 
+function isLocalPlayer()
+{
+	return initialized;
+}
+
+function getLocalTransformViewID()
+{
+	return localTransformViewID;
+}
+
 //RPC Calls ########################################
 
 @RPC
@@ -291,7 +300,6 @@ function UpdatePlayerTexture(transformViewID : NetworkViewID, textureIndex : int
 @RPC
 function InitPlayer (tViewID : NetworkViewID){//, aViewID : NetworkViewID) {
 	Debug.Log("Received player init ViewIDs " + tViewID);// + " and " + aViewID);
-	//localPlayer = player;
 	localTransformViewID = tViewID;
 	//localAnimationViewID = aViewID;
 	initialized = true;
@@ -365,3 +373,4 @@ function DestroyPlayer (transformViewID : NetworkViewID)
 	Destroy(playerInstance.playerTransform.gameObject);
 	Debug.Log("playerInfo length is "+playerInfo.length);	
 }
+
