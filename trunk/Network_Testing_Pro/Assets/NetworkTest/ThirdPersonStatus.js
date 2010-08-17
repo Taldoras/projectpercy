@@ -4,6 +4,8 @@ private var respawnPosition : Vector3;
 private var attacker : GameObject = null;
 private var spawnManager : SpawnTracker = null;
 private var playerId : NetworkViewID;
+private var playerName = "";
+private var textureIndex : int = 0;
 
 function Start()
 {
@@ -14,11 +16,6 @@ function Start()
 
 function Update () 
 {
-}
-
-function setPlayerID( myId : NetworkViewID )
-{
-	playerId = myId;
 }
 
 function Respawn ()
@@ -37,18 +34,6 @@ function Respawn ()
 	SendMessage("ShowPlayer");	// Show the player again
 }
 
-function SetAttacker(attackedBy : GameObject)
-{
-	//if(attackedBy != null)
-		//Debug.Log(this.gameObject.GetInstanceID()+" was attacked by "+attackedBy.GetInstanceID());
-	attacker = attackedBy;
-}
-
-function GetAttacker()
-{
-	return attacker;
-}
-
 function AwardPoint()
 {
 	score++;
@@ -65,4 +50,34 @@ function RemovePoint()
 	return score;
 }
 
+function SetAttacker(attackedBy : GameObject)
+{
+	//if(attackedBy != null)
+		//Debug.Log(this.gameObject.GetInstanceID()+" was attacked by "+attackedBy.GetInstanceID());
+	attacker = attackedBy;
+}
 
+function GetAttacker()
+{
+	return attacker;
+}
+
+function setPlayerID( myId : NetworkViewID )
+{
+	playerId = myId;
+}
+
+function getPlayerID()
+{
+	return playerId;
+}
+
+function getPlayerName()
+{
+	return playerName;
+}
+
+function setPlayerName( newName )
+{
+	playerName = newName;
+}
