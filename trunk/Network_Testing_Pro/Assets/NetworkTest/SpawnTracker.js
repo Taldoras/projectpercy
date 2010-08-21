@@ -83,6 +83,16 @@ function OnPlayerDisconnected (player : NetworkPlayer)
 	
 }
 
+
+function OnDisconnectedFromServer(info : NetworkDisconnection)  
+{
+	if (!Network.isServer)
+	{
+		CleanAllPlayers();
+	}
+}
+	
+
 function CleanUpPlayer(transformViewID : NetworkViewID)
 {
 	//Debug.Log("CleanUpPlayer called");
@@ -114,6 +124,9 @@ function cleanPlayer( deletePlayer : PlayerInfo )
 function CleanAllPlayers()
 {
 	Debug.Log("Clean ALL players "+playerInfo.length);
+	isInstantiated = false;	
+	initialized = false;
+	
 	
 	for(var playerInstance : PlayerInfo in playerInfo)
 	{
@@ -121,8 +134,6 @@ function CleanAllPlayers()
 
 		//Debug.Log("Destroying objects belonging to view ID " + playerInstance.transformViewID);
 		deletePlayer = playerInstance;
-		if(playerInstance.transformViewID == localTransformViewID)
-			isInstantiated = false;	
 
 		Network.RemoveRPCs(deletePlayer.player, 0);
 		Network.Destroy(playerInstance.transformViewID);
@@ -199,6 +210,7 @@ function InitServerPlayer()
 	playerInfo.Add(playerInstance);
 	
 	localTransformViewID = transformViewID;
+	initialized = true;
 	
 	return localTransformViewID;
 }
@@ -254,7 +266,7 @@ function SpawnServerPlayer(transformViewID)
 	isInstantiated = true;	
 }
 
-function isLocalPlayer()
+function isLocalInitialized()
 {
 	return initialized;
 }

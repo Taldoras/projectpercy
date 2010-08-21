@@ -257,38 +257,5 @@ public class GraduallyUpdateState : MonoBehaviour {
 			}
 		}
 	}
-/*
-	void OnDisconnectedFromServer(NetworkDisconnection info)  
-	{
-		if (Network.isServer)
-		{
-			Debug.Log("Local server connection disconnected");
-		}
-		else 
-		{
-			if (info == NetworkDisconnection.LostConnection)
-				Debug.Log("Lost connection to the server");
-			else
-			{
-				Debug.Log("Successfully diconnected from the server.  PeerType now "+Network.peerType);
-			}
-			if (spawnTracker == null)
-			{
-				Debug.Log("SpawnTracker is null");
-			}
-			else
-			{
 
-				//Right now there is only one network view for this object, the transform network view.  
-				//In the future we could have many more so we would need to index by the proper one.
-				NetworkView[] netViews = gameObject.GetComponents<NetworkView>();
-				if( netViews.Length == 1)
-					spawnTracker.SendMessage("CleanUpPlayer", netViews[0].viewID);
-				else
-					Debug.Log("Could not find the network views.");
-			}
-		}
-		//Destroy(gameObject);
-	}
-*/	
 }
