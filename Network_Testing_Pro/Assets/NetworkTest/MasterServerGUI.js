@@ -49,7 +49,7 @@ function OnFailedToConnect(info: NetworkConnectionError)
 
 function OnGUI ()
 {
-	var menuName = "Welcome " + gState.userName;
+	var menuName = "Welcome " + gState.playerName;
 	
 	windowRect = GUILayout.Window (0, windowRect, MakeWindow, menuName);
 }

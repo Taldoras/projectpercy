@@ -6,12 +6,17 @@ private var spawnManager : SpawnTracker = null;
 private var playerId : NetworkViewID;
 private var playerName = "";
 private var textureIndex : int = 0;
+private var globalState : GlobalState;
 
 function Start()
 {
     spawnManager = GameObject.Find("SpawnPoint").GetComponent(SpawnTracker);
 	//respawnPosition = transform.Find("SpawnPoint").position;
 	respawnPosition = spawnManager.transform.position;
+	
+	//go get player name
+	globalState = GameObject.Find("GlobalState").GetComponent(GlobalState);
+	playerName = globalState.playerName;
 }
 
 function Update () 

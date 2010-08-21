@@ -1,5 +1,5 @@
 DontDestroyOnLoad(this);
 
-var userName = "";
-var userId = "";
+var playerName = "";
+var playerId = "";
 var color = "";
