@@ -18,7 +18,7 @@ var windowRect = Rect(20, 200, 200, 400);
 var gState : GlobalState;
 	
 function Start() {
-
+	
 }
 
 function OnGUI () {
@@ -56,9 +56,13 @@ function showStart() {
 	
 function showLogin() {
 	//print("Showing login");
-	
+
+	//  a blank text field to test bugs occuring from 
+	GUI.SetNextControlName ("txtTestField");
+	var testField = GUI.TextField(Rect(20,200,100,20), "test field"); 
+
 	// the users name
-	 GUI.SetNextControlName ("txtUserName");
+	GUI.SetNextControlName ("txtUserName");
 	userName = GUI.TextField(Rect(20,10,100,20), userName); 
 
 	// password
@@ -104,10 +108,7 @@ function postLogin(userName, password) {
 		// TEMPORARY TEST
 		updateWelcome();
 		
-		
 		showStartGame();
-		
-		
 	}
 	else
 	{
