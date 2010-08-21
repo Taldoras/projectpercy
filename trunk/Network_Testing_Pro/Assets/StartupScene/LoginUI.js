@@ -168,6 +168,6 @@ function showStartGame() {
 
 
 function updateWelcome() {
-	gState.userName = userName;
-	welcomeMessage = "Welcome " + gState.userName + "!" ;	 
+	gState.playerName = userName;
+	welcomeMessage = "Welcome " + gState.playerName + "!" ;	 
 }
