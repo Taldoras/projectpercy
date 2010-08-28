@@ -52,7 +52,7 @@ function getQuickName()
 {
 	//return "Garfiend";
 	
-	var NumberOfPreWords = 5;
+	var NumberOfPreWords = 8;
 	var prefix = new Array();
 	
 	prefix.Push("Gar");
@@ -61,9 +61,13 @@ function getQuickName()
 	prefix.Push("Soo");
 	prefix.Push("Chew");
 	prefix.Push("Puss");
+	prefix.Push("Kill");
+	prefix.Push("Bigg");
+	prefix.Push("Hunni");
+	
 	
 
-	var NumberOfSufWords = 4;
+	var NumberOfSufWords = 7;
 	var suffix = new Array();
 	
 	suffix.Push("fiend");
@@ -71,6 +75,10 @@ function getQuickName()
 	suffix.Push("bum");
 	suffix.Push("pickles");
 	suffix.Push("puss");
+	suffix.Push("gore");
+	suffix.Push("monster");
+	suffix.Push("cut");
+	
 
     // Generate a random number between 1 and NumberOfWords
     var rndPre = Mathf.Ceil(Random.value * NumberOfPreWords);
