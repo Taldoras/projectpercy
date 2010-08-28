@@ -61,8 +61,8 @@ function getQuickName()
 	prefix.Push("Soo");
 	prefix.Push("Chew");
 	prefix.Push("Puss");
-	prefix.Push("Kill");
-	prefix.Push("Bigg");
+	prefix.Push("Killy");
+	prefix.Push("Biggsie");
 	prefix.Push("Hunni");
 	
 	
@@ -77,7 +77,7 @@ function getQuickName()
 	suffix.Push("puss");
 	suffix.Push("gore");
 	suffix.Push("monster");
-	suffix.Push("cut");
+	suffix.Push("cutt");
 	
 
     // Generate a random number between 1 and NumberOfWords
