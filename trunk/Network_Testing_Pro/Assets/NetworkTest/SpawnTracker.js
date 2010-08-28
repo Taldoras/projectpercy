@@ -297,12 +297,6 @@ function UpdatePlayerTexture(transformViewID : NetworkViewID, textureIndex : int
 	{
 		var ms = playerInstance.playerTransform.GetComponent(MaterialSelection);
 	}
-	/*
-	if( spawnTracker.localTransformViewID == viewID )
-	{
-		renderer.material.mainTexture = catTextures[texIndex];
-	}	
-	*/
 }
 
 

@@ -95,6 +95,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 
 	void OnGUI() 
 	{
+		/*
 		if (m_IsMine) 
 		{
 			connInfo = GUILayout.Window(0, connInfo, MakeConnInfoWindow, "Local Player");
@@ -103,6 +104,7 @@ public class GraduallyUpdateState : MonoBehaviour {
 		{
 			playerInfo = GUILayout.Window(1, playerInfo, MakeNetPlayerInfoWindow, "Net Player");
 		}
+		*/
 	}
 	
 	void MakeNetPlayerInfoWindow(int windowID)

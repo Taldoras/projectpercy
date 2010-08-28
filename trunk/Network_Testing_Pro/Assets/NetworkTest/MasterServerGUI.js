@@ -50,7 +50,6 @@ function OnFailedToConnect(info: NetworkConnectionError)
 function OnGUI ()
 {
 	var menuName = "Welcome " + gState.playerName;
-	
 	windowRect = GUILayout.Window (0, windowRect, MakeWindow, menuName);
 }
 
@@ -275,11 +274,13 @@ function MakeWindow (id : int)
 		if (GUILayout.Button ("Disconnect"))
 		{
 			Network.Disconnect();
-			MasterServer.UnregisterHost();
-			spawnTracker.SendMessage("CleanAllPlayers");
+			if(Network.isServer)
+			{
+				MasterServer.UnregisterHost();
+				spawnTracker.SendMessage("CleanAllPlayers");
+			}
 		}
-		
-		if(Network.isServer && !MasterServer.dedicatedServer)
+		if(!MasterServer.dedicatedServer && !spawnTracker.isLocalInitialized())
 		{
 			if(GUILayout.Button("Connect to Local Server"))
 			{
@@ -287,8 +288,7 @@ function MakeWindow (id : int)
 				var transformViewID : NetworkViewID = spawnTracker.InitServerPlayer();
 				spawnTracker.SpawnServerPlayer(transformViewID);
 			}
-		}	
-		
+		}		
 		GUILayout.FlexibleSpace();
 	}
 	GUI.DragWindow (Rect (0,0,1000,1000));
