@@ -37,6 +37,58 @@ if(GUI.Button (Rect ( scrW -100, scrH -20, 100, 20), GUIContent ("Credits", "Mad
 }
 
 function startQuickplay() {
+	
+	//set player's name
+	var playerName = getQuickName();
 	gState.playerName = playerName;
+		
+	// start it up!
+	Application.LoadLevel("Scene1");
 	
 }
+
+
+function getQuickName()
+{
+	//return "Garfiend";
+	
+	var NumberOfPreWords = 5;
+	var prefix = new Array();
+	
+	prefix.Push("Gar");
+	prefix.Push("Mister");
+	prefix.Push("Pooky");
+	prefix.Push("Soo");
+	prefix.Push("Chew");
+	prefix.Push("Puss");
+	
+
+	var NumberOfSufWords = 4;
+	var suffix = new Array();
+	
+	suffix.Push("fiend");
+	suffix.Push("boy");
+	suffix.Push("bum");
+	suffix.Push("pickles");
+	suffix.Push("puss");
+
+    // Generate a random number between 1 and NumberOfWords
+    var rndPre = Mathf.Ceil(Random.value * NumberOfPreWords);
+	var rndSuf = Mathf.Ceil(Random.value * NumberOfSufWords);
+
+    // Display the word inside the text box
+    var prefixName = prefix[rndPre];
+	
+	var suffixName = suffix[rndSuf];
+
+
+	return (prefixName + suffixName);
+}
+
+
+
+
+
+
+
+
