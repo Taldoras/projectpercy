@@ -81,8 +81,12 @@ function getQuickName()
 	
 	var suffixName = suffix[rndSuf];
 
+	var numberName = Random.Range(1,99);
 
-	return (prefixName + suffixName);
+	var fullName = (prefixName + suffixName + numberName);
+	print("Name for quickplay: " + fullName);
+	
+	return fullName;
 }
 
 
