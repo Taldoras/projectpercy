@@ -8,16 +8,24 @@ private var thirdPersonStatus : ThirdPersonStatus = null;
 private var tempTexIndex = 0;
 private var GUS = null;
 private var renderMenu = false;
+private var catMeshes = null;
 
 function Start () 
 {
+	//catMesh = GetComponentInChildren (MeshRenderer);
+	catMeshes = GetComponentsInChildren (MeshRenderer);
+
+    isnull = catMeshes == null;
+	Debug.Log("The catMeshes is  "+isnull);
 	spawnTracker =GameObject.Find("SpawnPoint").GetComponent(SpawnTracker);
 	thirdPersonStatus = GetComponent("ThirdPersonStatus");
 	GUS = GetComponent("GraduallyUpdateState");
-	renderer.material.mainTexture = catTextures[textureIndex];
+	Debug.Log("Hello this is mat sel start");
+	setPlayerTexture(textureIndex);
 	tempTexIndex = textureIndex;
-	
+	Debug.Log("post renderer ");
 	renderMenu = spawnTracker.getLocalTransformViewID() == thirdPersonStatus.getPlayerID();
+	Debug.Log("Render window is: "+renderMenu);
 }
 
 function TextureSelectorWindow (id : int) 
@@ -30,7 +38,7 @@ function TextureSelectorWindow (id : int)
 			GUILayout.Label("Texture wrap "+tempTexIndex);
 			tempTexIndex = 0;
 		}
-		renderer.material.mainTexture = catTextures[tempTexIndex];		
+		setPlayerTexture(tempTexIndex);		
 	}
 	
 	if( GUILayout.Button("Apply Texture") )
@@ -53,7 +61,10 @@ function setPlayerTexture( texIdx : int )
 	if( texIdx >= 0 && texIdx < catTextures.length )
 	{
 		textureIndex = texIdx;
-		renderer.material.mainTexture = catTextures[textureIndex];	
+		for (var catRender : MeshRenderer in catMeshes) 
+		{
+			catRender.renderer.material.mainTexture = catTextures[textureIndex];
+		}	
 	}
 	else
 	{
