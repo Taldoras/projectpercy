@@ -77,7 +77,7 @@ function OnPlayerConnected (player : NetworkPlayer)
 
 function OnPlayerDisconnected (player : NetworkPlayer) 
 {
-	Debug.Log("OnPlayerDisconnected called");
+	Debug.Log("*** OnPlayerDisconnected ***");
 	var playerInstance = getPlayer(player);
 	cleanPlayer(playerInstance);
 	
@@ -86,6 +86,7 @@ function OnPlayerDisconnected (player : NetworkPlayer)
 
 function OnDisconnectedFromServer(info : NetworkDisconnection)  
 {
+	Debug.Log("*** OnDisconnectedFromServer ***");
 	if (!Network.isServer)
 	{
 		CleanAllPlayers();
@@ -103,11 +104,12 @@ function CleanUpPlayer(transformViewID : NetworkViewID)
 
 function cleanPlayer( deletePlayer : PlayerInfo )
 {
+	Debug.Log("cleanPlayer begin");
 	if( deletePlayer == null )
 		return;
 	//Debug.Log("Cleaning up player " + playerInstance.player);
 	// Destroy the player object this network player spawned
-
+	Debug.Log("Player not null");
 	//Debug.Log("Destroying objects belonging to view ID " + playerInstance.transformViewID);
 	if(deletePlayer.transformViewID == localTransformViewID)
 		isInstantiated = false;	
@@ -115,8 +117,8 @@ function cleanPlayer( deletePlayer : PlayerInfo )
 	networkView.RPC("DestroyPlayer", RPCMode.All, deletePlayer.transformViewID);
 
 	Network.RemoveRPCs(deletePlayer.player, 0);
-	//Network.Destroy(deletePlayer.transformViewID);
-	//Network.DestroyPlayerObjects(deletePlayer.player);
+	Network.Destroy(deletePlayer.transformViewID);
+	Network.DestroyPlayerObjects(deletePlayer.player);
 	playerInfo.Remove(deletePlayer);
 	Debug.Log("playerInfo length is "+playerInfo.length);
 }
@@ -135,8 +137,8 @@ function CleanAllPlayers()
 		//Debug.Log("Destroying objects belonging to view ID " + playerInstance.transformViewID);
 		deletePlayer = playerInstance;
 
-		Network.RemoveRPCs(deletePlayer.player, 0);
-		Network.Destroy(playerInstance.transformViewID);
+		//Network.RemoveRPCs(deletePlayer.player, 0);
+		//Network.Destroy(playerInstance.transformViewID);
 		//Network.DestroyPlayerObjects(deletePlayer.player);
 	}
 	playerInfo.length = 0;
