@@ -44,18 +44,18 @@ function OnGUI(){
 		if(GUI.Button(Rect(100, 50, 100, 100),currentCatFaceTexture, "catPickerStyle"))
 		{
 			Debug.Log("Cat Pick Image");
+			countDown();
 			
 		}
 		
-		GUI.Label(Rect(0,150,300,100), "Waiting for Players");
+		
 		
 		GUI.EndGroup();
 	}
 	
 }
 
-function showCatFace(currentCatFace)
-{
+function showCatFace(currentCatFace){
 	Debug.Log("doing showCatFace. currentCatFace: " + currentCatFace);
 	
 	if(currentCatFace <= 1)
@@ -90,3 +90,20 @@ function showCatFace(currentCatFace)
 }
 
 
+
+
+function countDown(){
+	var o_countdownTimer : countdownTimer;
+	var f_timerdone = timerDone;
+	o_countdownTimer = GetComponent(countdownTimer);
+	o_countdownTimer.setStartTime(10);
+	o_countdownTimer.setTimerDoneAction(f_timerdone);
+	
+	o_countdownTimer.setTimerState(true);
+
+
+}
+
+	function timerDone() {
+		guiText.text = "FIGHT!";
+	}
