@@ -1,0 +1,110 @@
+fileFormatVersion: 1
+guid: e7d73e3e0f3a92649b33edce5e36d10f
+ModelImporter:
+  importerVersion: 4
+  meshes:
+    scaleFactor: 1
+    meshCompression: 0
+    generateColliders: 0
+    swapUVs: 0
+  tangentSpace:
+    generation: 0
+    calculateNormals: 0
+    smoothingAngle: 60
+    splitTangents: 0
+  materials:
+    generation: 1
+  animations:
+    generation: 3
+    bakeAnimations: 0
+    animationCompression: 1
+    animationWrapMode: 4
+    splitAnimations: 1
+  nodeInfo:
+    //RootNode:
+    - 100000
+    - 400000
+    - 11100000
+    tail_tip:
+    - 100002
+    - 400002
+    tail_v2:
+    - 100004
+    - 400004
+    tail_v1:
+    - 100006
+    - 400006
+    tail_base:
+    - 100008
+    - 400008
+    c_head:
+    - 100010
+    - 400010
+    l_foot:
+    - 100012
+    - 400012
+    r_foot:
+    - 100014
+    - 400014
+    l_hand:
+    - 100016
+    - 400016
+    l_elbow:
+    - 100018
+    - 400018
+    r_hand:
+    - 100020
+    - 400020
+    r_elbow:
+    - 100022
+    - 400022
+    hip:
+    - 100024
+    - 400024
+    pCatTail:
+    - 100026
+    - 400026
+    - 13700000
+    pLeftWhisker:
+    - 100028
+    - 400028
+    - 13700002
+    pCatRWhisker:
+    - 100030
+    - 400030
+    - 13700004
+    pCatRFoot:
+    - 100032
+    - 400032
+    - 13700006
+    pCatRHand:
+    - 100034
+    - 400034
+    - 13700008
+    pCatLFoot:
+    - 100036
+    - 400036
+    - 13700010
+    pCatLHand:
+    - 100038
+    - 400038
+    - 13700012
+    pCatHead:
+    - 100040
+    - 400040
+    - 13700014
+    group4:
+    - 100042
+    - 400042
+AssetImporter:
+  importerVersion: 1
+  fileIDToRecycleName:
+    4300000: pCatHead
+    4300002: pCatLHand
+    4300004: pCatLFoot
+    4300006: pCatRHand
+    4300008: pCatRFoot
+    4300010: pCatRWhisker
+    4300012: pLeftWhisker
+    4300014: pCatTail
+    7400000: Take 001 //// catCheer1
