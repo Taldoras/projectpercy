@@ -9,6 +9,8 @@ private var isInstantiated : boolean = false;
 private var playerInfo : Array = new Array();
 
 private var scoreInfo : Rect = new Rect (0,320,320,320);
+var catScoreMenuTexture : Texture2D;
+var catLifeMenuTexture : Texture2D;
 
 class PlayerInfo 
 {
@@ -34,7 +36,41 @@ function OnGUI ()
 			}
 		}	
 	}
-	scoreInfo = GUILayout.Window(2, scoreInfo, ScoreWindow, "Scores");		
+	DrawScoreMenus();
+}
+
+function DrawScoreMenus()
+{
+	var picDimensionX = 32;
+	var picDimensionY = 32;
+
+	var menuPositions = new Array();
+	menuPositions[0] = [0,0];
+	menuPositions[1] = [Screen.width-256,0];
+	menuPositions[2] = [0,Screen.height-70];
+	menuPositions[3] = [Screen.width-256,Screen.height-70];
+	
+	var playerCount = playerInfo.length;
+	if ( playerCount > 0 )
+	{
+		var currentPlayerIndex = 0;
+		while ( (currentPlayerIndex < playerInfo.length) && (currentPlayerIndex < menuPositions.length) )
+		{
+			var x = menuPositions[currentPlayerIndex][0];
+			var y = menuPositions[currentPlayerIndex][1];
+			GUI.Label(Rect(x,y,256,70), catScoreMenuTexture);
+
+			var playerinstance : PlayerInfo = playerInfo[currentPlayerIndex];
+			for ( var i=0; i<=(8+playerinstance.score); i=i+1)
+			{
+				var currentX = x + i*(picDimensionX-6);
+				GUI.Label(Rect(currentX,y+(70-picDimensionY),picDimensionX,picDimensionY),catLifeMenuTexture);
+			}
+		
+			currentPlayerIndex++;
+		}
+	}
+	
 }
 
 // This runs if the scene is executed from the loader scene.

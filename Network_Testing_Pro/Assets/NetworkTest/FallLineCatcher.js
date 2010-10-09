@@ -7,6 +7,18 @@ function Start()
 
 function OnTriggerEnter (other : Collider)
 {
+	var tPS : ThirdPersonStatus = other.GetComponent(ThirdPersonStatus);
+	if ( tPS )
+	{
+		tPS.Respawn();
+		
+		if ( Network.isServer )
+		{
+			tPS.RemovePoint();
+		}
+	}
+}
+/*
 	var tPS : ThirdPersonStatus = other.GetComponent (ThirdPersonStatus);
 	// Player fall out!
 	if (tPS)
@@ -29,6 +41,7 @@ function OnTriggerEnter (other : Collider)
 		}	
 	}
 }
+*/
 
 // Auto setup the pickup
 function Reset ()
