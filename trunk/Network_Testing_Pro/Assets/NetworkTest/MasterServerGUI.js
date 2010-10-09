@@ -24,7 +24,7 @@ private var probingPublicIP = false;
 private var doneTesting = false;
 private var timer : float = 0.0;
 
-private var windowRect = Rect (Screen.width-300,0,300,100);
+private var windowRect = Rect ((Screen.width/2)-150,0,300,100);
 private var hideTest = false;
 private var testMessage = "Undetermined NAT capabilities";
 private var runDedicated = false;
