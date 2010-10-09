@@ -18,7 +18,7 @@ ModelImporter:
     generation: 3
     bakeAnimations: 0
     animationCompression: 1
-    animationWrapMode: 4
+    animationWrapMode: 2
     splitAnimations: 1
   nodeInfo:
     //RootNode:
