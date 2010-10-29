@@ -1,5 +1,5 @@
 fileFormatVersion: 1
-guid: ccd2d4370aafa0745a72522132035262
+guid: 647957714f1f6b94fb702f6920a73127
 ModelImporter:
   importerVersion: 4
   meshes:
@@ -21,98 +21,90 @@ ModelImporter:
     animationWrapMode: 0
     splitAnimations: 1
   nodeInfo:
-    //RootNode:
+    l_foot:
     - 100000
     - 400000
-    - 11100000
-    group4:
+    r_foot:
     - 100002
     - 400002
-    tail_tip:
+    //RootNode:
     - 100004
     - 400004
-    tail_v2:
+    - 11100000
+    tail_tip:
     - 100006
     - 400006
-    tail_v1:
+    tail_v2:
     - 100008
     - 400008
-    tail_base:
+    tail_v1:
     - 100010
     - 400010
-    c_head:
+    tail_base:
     - 100012
     - 400012
-    l_foot:
+    c_head:
     - 100014
     - 400014
-    r_foot:
+    l_hand:
     - 100016
     - 400016
-    l_hand:
+    l_elbow:
     - 100018
     - 400018
-    l_elbow:
+    r_hand:
     - 100020
     - 400020
-    r_hand:
+    r_elbow:
     - 100022
     - 400022
-    r_elbow:
+    hip:
     - 100024
     - 400024
-    hip:
+    pCatTail:
     - 100026
     - 400026
-    pCatTail:
-    - 100028
-    - 400028
     - 13700000
     pLeftWhisker:
-    - 100030
-    - 400030
+    - 100028
+    - 400028
     - 13700002
     pCatRWhisker:
-    - 100032
-    - 400032
+    - 100030
+    - 400030
     - 13700004
     pCatRFoot:
-    - 100034
-    - 400034
+    - 100032
+    - 400032
     - 13700006
     pCatRHand:
-    - 100036
-    - 400036
+    - 100034
+    - 400034
     - 13700008
     pCatLFoot:
-    - 100038
-    - 400038
+    - 100036
+    - 400036
     - 13700010
     pCatLHand:
-    - 100040
-    - 400040
+    - 100038
+    - 400038
     - 13700012
     pCatHead:
+    - 100040
+    - 400040
+    - 13700014
+    group4:
     - 100042
     - 400042
-    - 13700014
 AssetImporter:
   importerVersion: 1
   fileIDToRecycleName:
-    4300000: pSphere1
-    4300002: pCube1
-    4300004: pCube2
-    4300006: pCube4
-    4300008: pCube5
-    4300010: pPlane1
-    4300012: pPlane2
-    4300014: pCylinder1
-    4300016: pCatHead
-    4300018: pCatLHand
-    4300020: pCatLFoot
-    4300022: pCatRHand
-    4300024: pCatRFoot
-    4300026: pCatRWhisker
-    4300028: pLeftWhisker
-    4300030: pCatTail
-    7400000: Take 001 //// sumoCat
+    4300000: pCatHead
+    4300002: pCatLHand
+    4300004: pCatLFoot
+    4300006: pCatRHand
+    4300008: pCatRFoot
+    4300010: pCatRWhisker
+    4300012: pLeftWhisker
+    4300014: pCatTail
+    7400000: Take 001 //// catIdle@idle

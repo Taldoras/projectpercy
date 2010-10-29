@@ -3,7 +3,7 @@ var test:boolean = false;
 // Local player information when one is instantiated
 private var initialized : boolean  = false;
 private var localTransformViewID : NetworkViewID;
-//private var localAnimationViewID : NetworkViewID;
+private var localAnimationViewID : NetworkViewID;
 private var isInstantiated : boolean = false;
 // The server uses this to track all intantiated player
 private var playerInfo : Array = new Array();
@@ -12,10 +12,13 @@ private var scoreInfo : Rect = new Rect (0,320,320,320);
 var catScoreMenuTexture : Texture2D;
 var catLifeMenuTexture : Texture2D;
 
+private var TRANS_VIEW_ID = 0;  //enumeration for transform and animation viewIDs
+private var ANIM_VIEW_ID = 1;
+
 class PlayerInfo 
 {
 	var transformViewID : NetworkViewID;
-	//var animationViewID : NetworkViewID;
+	var animationViewID : NetworkViewID;
 	var player : NetworkPlayer; //local server players will not have a value for this since there is no network connection
 	var playerTransform : Transform;
 	var ready : boolean = false;
@@ -31,7 +34,7 @@ function OnGUI ()
 			if (GUI.Button(new Rect(20,Screen.height-60, 90, 20),"SpawnPlayer"))
 			{
 				// Spawn the player on all machines
-				networkView.RPC("SpawnPlayer", RPCMode.AllBuffered, localTransformViewID);//, localAnimationViewID);
+				networkView.RPC("SpawnPlayer", RPCMode.AllBuffered, localTransformViewID, localAnimationViewID);
 				isInstantiated = true;
 			}
 		}	
@@ -101,13 +104,14 @@ function OnPlayerConnected (player : NetworkPlayer)
 	{
 		Debug.Log("Sending player init to "+player);
 		var transformViewID : NetworkViewID = Network.AllocateViewID();
-		//var	animationViewID : NetworkViewID = Network.AllocateViewID();
-		Debug.Log("Player given view IDs "+ transformViewID);// + " and " + animationViewID);
+		var animationViewID : NetworkViewID = Network.AllocateViewID();
 		var playerInstance : PlayerInfo = new PlayerInfo();
 		playerInstance.transformViewID = transformViewID;
-		//playerInstance.animationViewID = animationViewID;
+		playerInstance.animationViewID = animationViewID;
 		playerInstance.player = player;	
-		networkView.RPC("InitPlayer", player, transformViewID);//, animationViewID);
+		playerInfo.Add(playerInstance);
+		Debug.Log("Player given view IDs "+ transformViewID + " and " + animationViewID);
+		networkView.RPC("InitPlayer", player, transformViewID, animationViewID);
 	}
 }
 
@@ -239,21 +243,21 @@ function InitServerPlayer()
 
 	Debug.Log("Initialize server player. (No net connection)");
 	var transformViewID : NetworkViewID = Network.AllocateViewID();
-	//var	animationViewID : NetworkViewID = Network.AllocateViewID();
-	Debug.Log("Server player given view IDs "+ transformViewID);// + " and " + animationViewID);
+	var animationViewID : NetworkViewID = Network.AllocateViewID();
+	Debug.Log("Server player given view IDs "+ transformViewID + " and " + animationViewID);
 	var playerInstance : PlayerInfo = new PlayerInfo();
 	playerInstance.transformViewID = transformViewID;
-	//playerInstance.animationViewID = animationViewID;
+	playerInstance.animationViewID = animationViewID;
 	//playerInstance.player = null;	
 	playerInfo.Add(playerInstance);
 	
-	localTransformViewID = transformViewID;
+	//localTransformViewID = transformViewID;
 	initialized = true;
 	
-	return localTransformViewID;
+	return playerInstance;
 }
 
-function SpawnServerPlayer(transformViewID)
+function SpawnServerPlayer(transformViewID, animationViewID)
 {
 	var playerInstance = getPlayer(transformViewID);
 	if( playerInstance == null )
@@ -264,21 +268,21 @@ function SpawnServerPlayer(transformViewID)
 
 	Debug.Log("Instantiating server player");
 	var instantiatedPlayer : Transform = Instantiate(playerPrefab, transform.position, transform.rotation);
-	var networkViews = instantiatedPlayer.GetComponents(NetworkView);
+	var networkViews = instantiatedPlayer.GetComponentsInChildren(NetworkView);
 	
 	//set the id on the instance so we can communicate with other components 
 	instantiatedPlayer.GetComponent (ThirdPersonStatus).setPlayerID(transformViewID);
 	
 	// Assign view IDs to player object
-	if (networkViews.Length != 1) 
+	if (networkViews.Length != 2) 
 	{
-		Debug.Log("Error while spawning player, prefab should have 1 network views, has "+networkViews.Length);
+		Debug.Log("Error while spawning player, prefab should have 2 network views, has "+networkViews.Length);
 		return;
 	} 
 	else 
 	{
-		networkViews[0].viewID = transformViewID;
-		//networkViews[1].viewID = animationViewID;
+		networkViews[TRANS_VIEW_ID].viewID = transformViewID;
+		networkViews[ANIM_VIEW_ID].viewID = animationViewID;
 	}
 	
 	instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
@@ -300,7 +304,8 @@ function SpawnServerPlayer(transformViewID)
 	
 	Debug.Log("There are now " + playerInfo.length + " players active");
 	
-	networkView.RPC("SpawnPlayer", RPCMode.OthersBuffered, localTransformViewID);//, localAnimationViewID);
+	//networkView.RPC("SpawnPlayer", RPCMode.OthersBuffered, localTransformViewID, localAnimationViewID);
+	networkView.RPC("SpawnPlayer", RPCMode.OthersBuffered, transformViewID, animationViewID);
 	isInstantiated = true;	
 }
 
@@ -342,35 +347,35 @@ function UpdatePlayerTexture(transformViewID : NetworkViewID, textureIndex : int
 // This is later used to recognize if a network spawned player is the local player.
 // Also record assigned view IDs so the server can synch the player correctly.
 @RPC
-function InitPlayer (tViewID : NetworkViewID){//, aViewID : NetworkViewID) {
-	Debug.Log("Received player init ViewIDs " + tViewID);// + " and " + aViewID);
+function InitPlayer (tViewID : NetworkViewID, aViewID : NetworkViewID) {
+	Debug.Log("Received player init ViewIDs " + tViewID + " and " + aViewID);
 	localTransformViewID = tViewID;
-	//localAnimationViewID = aViewID;
+	localAnimationViewID = aViewID;
 	initialized = true;
 }
 
 // Create a networked player in the game. Instantiate a local copy of the player, set the view IDs
 // accordingly. 
 @RPC
-function SpawnPlayer (transformViewID : NetworkViewID)//, animationViewID : NetworkViewID) {
+function SpawnPlayer (transformViewID : NetworkViewID, animationViewID : NetworkViewID) 
 {
-	Debug.Log("Instantiating player " + transformViewID);
+	Debug.Log("Instantiating player tID " + transformViewID + " aID " + animationViewID);
 	var instantiatedPlayer : Transform = Instantiate(playerPrefab, transform.position, transform.rotation);
-	var networkViews = instantiatedPlayer.GetComponents(NetworkView);
+	var networkViews = instantiatedPlayer.GetComponentsInChildren(NetworkView);
 	
 	//set the id on the instance so we can communicate with other components 
 	instantiatedPlayer.GetComponent (ThirdPersonStatus).setPlayerID(transformViewID);
 	
 	// Assign view IDs to player object
-	if (networkViews.Length != 1) 
+	if (networkViews.Length != 2) 
 	{
-		Debug.Log("Error while spawning player, prefab should have 1 network views, has "+networkViews.Length);
+		Debug.Log("Error while spawning player, prefab should have 2 network views, has "+networkViews.Length);
 		return;
 	} 
 	else 
 	{
-		networkViews[0].viewID = transformViewID;
-		//networkViews[1].viewID = animationViewID;
+		networkViews[TRANS_VIEW_ID].viewID = transformViewID;
+		networkViews[ANIM_VIEW_ID].viewID = animationViewID;
 	}
 	
 	instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
@@ -378,7 +383,7 @@ function SpawnPlayer (transformViewID : NetworkViewID)//, animationViewID : Netw
 	// Record player info so he can be destroyed properly
 	var playerInstance : PlayerInfo = new PlayerInfo();
 	playerInstance.transformViewID = transformViewID;
-	//playerInstance.animationViewID = animationViewID;
+	playerInstance.animationViewID = animationViewID;
 	//playerInstance.player = playerIdentifier;
 	playerInstance.playerTransform = instantiatedPlayer;
 	Debug.Log("playerId (transformViewID): "+playerInstance.transformViewID); 
