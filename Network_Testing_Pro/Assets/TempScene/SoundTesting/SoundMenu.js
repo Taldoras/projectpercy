@@ -1,10 +1,14 @@
 var madCat1 : AudioClip;
 var madCat2 : AudioClip;
-
-
-
-function Update () {
-}
+var madCatHit : AudioClip;
+var fallingCat : AudioClip;
+var catHurt : AudioClip;
+var meow : AudioClip;
+var meow2 : AudioClip;
+var crowd : AudioClip;
+var winRoar : AudioClip;
+var splash : AudioClip;
+var beep : AudioClip;
 
 function OnGUI () {
 
@@ -20,23 +24,62 @@ function OnGUI () {
 		audio.PlayOneShot(madCat2);
 	}
 
-	if(GUILayout.Button("MadCat3"))
+	if(GUILayout.Button("MadCatHit"))
 	{
-		print("Play MadCat2");
-		audio.PlayOneShot(madCat2);
+		print("Play MadCatHit");
+		audio.PlayOneShot(madCatHit);
 	}
 	
-	if(GUILayout.Button("MadCat4"))
+	if(GUILayout.Button("FallingCat"))
 	{
-		print("Play MadCat2");
-		audio.PlayOneShot(madCat2);
+		print("Play FallingCat");
+		audio.PlayOneShot(fallingCat);
 	}
 	
-	if(GUILayout.Button("MadCat5"))
+	if(GUILayout.Button("CatHurt"))
 	{
-		print("Play MadCat2");
-		audio.PlayOneShot(madCat2);
+		print("Play CatHurt");
+		audio.PlayOneShot(catHurt);
 	}
+	
+	if(GUILayout.Button("Meow"))
+	{
+		print("Play Meow");
+		audio.PlayOneShot(meow);
+	}
+	
+	if(GUILayout.Button("Meow2"))
+	{
+		print("Play Meow2");
+		audio.PlayOneShot(meow2);
+	}
+	
+	if(GUILayout.Button("Crowd"))
+	{
+		print("Play Crowd");
+		audio.PlayOneShot(crowd);
+	}
+	
+	if(GUILayout.Button("WinRoar"))
+	{
+		print("Play WinRoar");
+		audio.PlayOneShot(winRoar);
+	}
+	
+	if(GUILayout.Button("Splash"))
+	{
+		print("Play Splash");
+		audio.PlayOneShot(splash);
+	}
+	
+	if(GUILayout.Button("Beep"))
+	{
+		print("Play Beep");
+		audio.PlayOneShot(beep);
+	}
+	
+	
+
 }
 @script RequireComponent(AudioSource)
 
