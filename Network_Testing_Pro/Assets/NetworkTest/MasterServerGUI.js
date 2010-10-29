@@ -273,9 +273,11 @@ function MakeWindow (id : int)
 	{
 		if (GUILayout.Button ("Disconnect"))
 		{
+			Debug.Log("Disconnect button pressed.");
 			Network.Disconnect();
 			if(Network.isServer)
 			{
+				Debug.Log("I think I'm a sever!");
 				MasterServer.UnregisterHost();
 				spawnTracker.SendMessage("CleanAllPlayers");
 			}
@@ -285,8 +287,8 @@ function MakeWindow (id : int)
 			if(GUILayout.Button("Connect to Local Server"))
 			{
 				//	networkView.RPC("InitPlayer", player, player, transformViewID, animationViewID);
-				var transformViewID : NetworkViewID = spawnTracker.InitServerPlayer();
-				spawnTracker.SpawnServerPlayer(transformViewID);
+				var playerInstance : PlayerInfo  = spawnTracker.InitServerPlayer();
+				spawnTracker.SpawnServerPlayer(playerInstance.transformViewID, playerInstance.animationViewID);
 			}
 		}		
 		GUILayout.FlexibleSpace();
