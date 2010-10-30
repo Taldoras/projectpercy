@@ -11,6 +11,8 @@ private var playerInfo : Array = new Array();
 private var scoreInfo : Rect = new Rect (0,320,320,320);
 var catScoreMenuTexture : Texture2D;
 var catLifeMenuTexture : Texture2D;
+var gameOverScreen : GameOverMenu;
+var gameOver : boolean = false;
 
 private var TRANS_VIEW_ID = 0;  //enumeration for transform and animation viewIDs
 private var ANIM_VIEW_ID = 1;
@@ -23,6 +25,11 @@ class PlayerInfo
 	var playerTransform : Transform;
 	var ready : boolean = false;
 	var score : int = 0;
+}
+
+function DrawGameOver()
+{
+	gameOverScreen.gameOverVisible = gameOver;
 }
 
 function OnGUI () 
@@ -40,6 +47,7 @@ function OnGUI ()
 		}	
 	}
 	DrawScoreMenus();
+	DrawGameOver();
 }
 
 function DrawScoreMenus()
@@ -57,6 +65,7 @@ function DrawScoreMenus()
 	if ( playerCount > 0 )
 	{
 		var currentPlayerIndex = 0;
+		var playersAliveCount = 0;
 		while ( (currentPlayerIndex < playerInfo.length) && (currentPlayerIndex < menuPositions.length) )
 		{
 			var x = menuPositions[currentPlayerIndex][0];
@@ -69,11 +78,28 @@ function DrawScoreMenus()
 				var currentX = x + i*(picDimensionX-6);
 				GUI.Label(Rect(currentX,y+(70-picDimensionY),picDimensionX,picDimensionY),catLifeMenuTexture);
 			}
-		
+			if (playerinstance.score > -9)
+			{
+				playersAliveCount++;
+			}
 			currentPlayerIndex++;
 		}
+		gameOver = false;
+		if (playerCount == 1)
+		{
+			if(playersAliveCount < 1)
+			{
+				gameOver = true;
+			}
+		}
+		else
+		{
+			if(playersAliveCount < 2)
+			{
+				gameOver = true;
+			}
+		}
 	}
-	
 }
 
 // This runs if the scene is executed from the loader scene.
