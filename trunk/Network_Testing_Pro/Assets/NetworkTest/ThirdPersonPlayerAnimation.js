@@ -3,6 +3,8 @@ var walkSpeedScale = 1.0;
 
 private var myAnim : Animation;
 
+var meow : AudioClip;
+
 function Start ()
 {
 	Debug.Log("myAnim is "+GetComponentInChildren(Animation));
@@ -96,6 +98,13 @@ function Update ()
 		else
 		{
 			myAnim.CrossFade ("jump", 0.2);
+
+			if (!audio.isPlaying)
+			{
+				print("Play Meow");
+				audio.clip = meow;
+				audio.Play();
+			}
 		}
 	}
 	// We fell down somewhere
@@ -137,6 +146,18 @@ function DidWallJump ()
 	// But we really have to make sure that the animation is in full control so 
 	// that we don't do weird blends between 180 degree apart rotations
 	//animation.Play ("walljump");
+}
+
+function MakeNoise()
+{
+	/*
+	if (audio.isPlaying == false)
+	{
+		print("Play Meow");
+		audio.Play(meow);
+	}
+	*/
+		
 }
 
 @script AddComponentMenu ("Third Person Player/Third Person Player Animation")
