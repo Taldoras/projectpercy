@@ -14,10 +14,13 @@ if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +10, 100, 20), GUIContent ("Quick Play"
 	startQuickplay();
 }
 
+/*
+ * Login disabled
 if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +50, 100, 20), GUIContent ("Login", "Logging in allows you to save your cat!")))
 {
 	print("login clicked");
 }
+*/
 
 if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +90, 100, 20), GUIContent ("Exit", "Quit the game")))
 {
