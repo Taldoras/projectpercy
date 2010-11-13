@@ -2,15 +2,15 @@ var runSpeedScale = 1.0;
 var walkSpeedScale = 1.0;
 
 private var myAnim : Animation;
-
+private	var playerController : ThirdPersonController;
+	
 var meow : AudioClip;
 var meow2 : AudioClip;
 var meow3Mad : AudioClip;
 
 function Start ()
 {
-	Debug.Log("myAnim is "+GetComponentInChildren(Animation));
-
+	playerController = GetComponent(ThirdPersonController);
 	myAnim = GetComponentInChildren(Animation);
 
 	Debug.Log("myAnim is "+myAnim);
@@ -26,38 +26,14 @@ function Start ()
 	// The jump animation is clamped and overrides all others
 	myAnim["jump"].layer = 1;
 	myAnim["jump"].wrapMode = WrapMode.ClampForever;
-/*
-	animation["ledgefall"].layer = 9;	
-	animation["ledgefall"].wrapMode = WrapMode.Loop;
 
-	animation["jumpfall"].layer = 10;	
-	animation["jumpfall"].wrapMode = WrapMode.ClampForever;
-
-	// This is the jet-pack controlled descent animation.
-	animation["jetpackjump"].layer = 10;	
-	animation["jetpackjump"].wrapMode = WrapMode.ClampForever;
-
-	animation["jumpland"].layer = 10;	
-	animation["jumpland"].wrapMode = WrapMode.Once;
-
-	animation["walljump"].layer = 11;	
-	animation["walljump"].wrapMode = WrapMode.Once;
-
-	// we actually use this as a "got hit" animation
-	animation["buttstomp"].speed = 0.15;
-	animation["buttstomp"].layer = 20;
-	animation["buttstomp"].wrapMode = WrapMode.Once;	
-	var punch = animation["punch"];
-	punch.wrapMode = WrapMode.Once;
-*/
-	// We are in full control here - don't let any other animations play when we start
+    // We are in full control here - don't let any other animations play when we start
 	myAnim.Stop();
 	myAnim.Play("idle");
 }
 
 function Update ()
 {
-	var playerController : ThirdPersonController = GetComponent(ThirdPersonController);
 	var currentSpeed = playerController.GetSpeed();
 
 	// Fade in run
@@ -125,7 +101,7 @@ function Update ()
 	// We are not falling down anymore
 	else
 	{
-		animation.Blend ("idle", 0.0, 0.2);
+		//animation.Blend ("idle", 0.0, 0.2);
 	}
 }
 
@@ -162,7 +138,7 @@ function MakeNoise(soundType)
 {
 	if (!audio.isPlaying)
 	{
-		print("Play Meow");
+		//print("Play Meow");
 		
 		var randomSound = Random.Range(1,30);
 		

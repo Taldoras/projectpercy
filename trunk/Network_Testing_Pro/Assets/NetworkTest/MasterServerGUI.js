@@ -186,7 +186,7 @@ function MakeWindow (id : int)
 		if (GUILayout.Button ("Start Server"))
 		{
 			Network.InitializeServer(32, listenPort);
-			MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
+			MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat cat off!");
 		}		
 		
 		GUILayout.FlexibleSpace();
@@ -210,7 +210,7 @@ function MakeWindow (id : int)
 			for (var element in data)
 			{
 				GUILayout.BeginHorizontal();
-				Debug.Log("Hosts found.");
+				//Debug.Log("Hosts found.");
 				// Do not display NAT enabled games if we cannot do NAT punchthrough
 				if ( !(filterNATHosts && element.useNat) )
 				{
