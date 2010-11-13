@@ -4,6 +4,8 @@ var walkSpeedScale = 1.0;
 private var myAnim : Animation;
 
 var meow : AudioClip;
+var meow2 : AudioClip;
+var meow3Mad : AudioClip;
 
 function Start ()
 {
@@ -98,13 +100,21 @@ function Update ()
 		else
 		{
 			myAnim.CrossFade ("jump", 0.2);
-
+			
+			MakeNoise("jump");
+			/*
+			*
+			* Extracting to fucnction maybe...
+			*
+			
+			
 			if (!audio.isPlaying)
 			{
 				print("Play Meow");
 				audio.clip = meow;
 				audio.Play();
 			}
+			*/
 		}
 	}
 	// We fell down somewhere
@@ -148,15 +158,29 @@ function DidWallJump ()
 	//animation.Play ("walljump");
 }
 
-function MakeNoise()
+function MakeNoise(soundType)
 {
-	/*
-	if (audio.isPlaying == false)
+	if (!audio.isPlaying)
 	{
 		print("Play Meow");
-		audio.Play(meow);
+		
+		var randomSound = Random.Range(1,30);
+		
+		if(randomSound < 13)
+		{
+		audio.clip = meow;
+		}
+		else if(randomSound < 27)
+		{
+		audio.clip = meow2;
+		}
+		else if(randomSound < 30)
+		{
+		audio.clip = meow3Mad;
+		}
+		
+		audio.Play();
 	}
-	*/
 		
 }
 
