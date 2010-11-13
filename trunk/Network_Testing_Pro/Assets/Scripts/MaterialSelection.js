@@ -16,16 +16,17 @@ function Start ()
 	catMeshes = GetComponentsInChildren (MeshRenderer);
 
     isnull = catMeshes == null;
-	Debug.Log("The catMeshes is  "+isnull);
+	//Debug.Log("The catMeshes is  "+isnull);
 	spawnTracker =GameObject.Find("SpawnPoint").GetComponent(SpawnTracker);
 	thirdPersonStatus = GetComponent("ThirdPersonStatus");
 	GUS = GetComponent("GraduallyUpdateState");
-	Debug.Log("Hello this is mat sel start");
+	//Debug.Log("Hello this is mat sel start");
 	setPlayerTexture(textureIndex);
 	tempTexIndex = textureIndex;
-	Debug.Log("post renderer ");
+	//Debug.Log("post renderer ");
+	//Debug.Log("ST.get is "+spawnTracker.getLocalTransformViewID()+" tps.id "+thirdPersonStatus.getPlayerID());
 	renderMenu = spawnTracker.getLocalTransformViewID() == thirdPersonStatus.getPlayerID();
-	Debug.Log("Render window is: "+renderMenu);
+	//Debug.Log("Render window is: "+renderMenu);
 }
 
 function TextureSelectorWindow (id : int) 
