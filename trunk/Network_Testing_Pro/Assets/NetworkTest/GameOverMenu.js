@@ -21,11 +21,13 @@ function OnGUI(){
 		if(GUI.Button(Rect(0, 280,200,200), "Play Again", btnStyle))
 		{	
 			Debug.Log("Play Again");
+			Application.LoadLevel("StartupScene");
 		}
 		
 		if(GUI.Button(Rect(220, 280,200,200), "Quit", btnStyle))
 		{	
 			Debug.Log("Quit");
+			Application.LoadLevel("StartupScene");
 		}
 		
 		GUI.EndGroup();
