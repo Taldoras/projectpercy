@@ -407,14 +407,17 @@ function SpawnPlayer (transformViewID : NetworkViewID, animationViewID : Network
 	instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
 	//instantiatedPlayer.GetComponent(AuthServerPersonAnimation).enabled = true;
 	// Record player info so he can be destroyed properly
-	var playerInstance : PlayerInfo = new PlayerInfo();
-	playerInstance.transformViewID = transformViewID;
-	playerInstance.animationViewID = animationViewID;
-	//playerInstance.player = playerIdentifier;
-	playerInstance.playerTransform = instantiatedPlayer;
-	Debug.Log("playerId (transformViewID): "+playerInstance.transformViewID); 
-	playerInfo.Add(playerInstance);
-		
+	if ( !Network.isServer )
+	{
+		var playerInstance : PlayerInfo = new PlayerInfo();
+		playerInstance.transformViewID = transformViewID;
+		playerInstance.animationViewID = animationViewID;
+		//playerInstance.player = playerIdentifier;
+		playerInstance.playerTransform = instantiatedPlayer;
+		Debug.Log("playerId (transformViewID): "+playerInstance.transformViewID); 
+		playerInfo.Add(playerInstance);
+	}
+	
 	// Initialize local player
 	if (transformViewID == localTransformViewID) 
 	{
