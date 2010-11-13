@@ -1,4 +1,6 @@
 private var spawnManager : GameObject;
+var splash : AudioClip; 
+var respawning;
 
 function Start()
 {
@@ -10,7 +12,14 @@ function OnTriggerEnter (other : Collider)
 	var tPS : ThirdPersonStatus = other.GetComponent(ThirdPersonStatus);
 	if ( tPS )
 	{
-		tPS.Respawn();
+		
+		print("Play Splash");
+		audio.clip = splash;
+		audio.Play();
+		
+		
+		//tPS.Respawn();
+		respawnPlayer(tPS);
 		
 		if ( Network.isServer )
 		{
@@ -18,6 +27,21 @@ function OnTriggerEnter (other : Collider)
 		}
 	}
 }
+
+function respawnPlayer(tPS)
+{
+	if(!respawning)
+	{
+		respawning = true;
+		
+		yield WaitForSeconds(3);
+		
+		tPS.Respawn();
+		
+		respawning = false;
+	}
+}
+
 /*
 	var tPS : ThirdPersonStatus = other.GetComponent (ThirdPersonStatus);
 	// Player fall out!
