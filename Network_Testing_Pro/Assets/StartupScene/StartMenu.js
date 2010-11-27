@@ -21,11 +21,12 @@ if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +50, 100, 20), GUIContent ("Login", "Lo
 	print("login clicked");
 }
 */
-
+/*
 if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +90, 100, 20), GUIContent ("Exit", "Quit the game")))
 {
 	print("exit clicked");
 }
+*/
     
 // If the user hovers the mouse over the button, the global tooltip gets set
 GUI.Box (Rect (scrW/2 -150, scrH -40, 300, 40), GUI.tooltip);
