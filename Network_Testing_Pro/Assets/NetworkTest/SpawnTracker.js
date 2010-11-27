@@ -38,12 +38,12 @@ function OnGUI ()
 	{
 		if (initialized && !isInstantiated) 
 		{
-			if (GUI.Button(new Rect(20,Screen.height-60, 90, 20),"SpawnPlayer"))
-			{
+			//if (GUI.Button(new Rect(20,Screen.height-60, 90, 20),"SpawnPlayer"))
+			//{
 				// Spawn the player on all machines
 				networkView.RPC("SpawnPlayer", RPCMode.AllBuffered, localTransformViewID, localAnimationViewID);
 				isInstantiated = true;
-			}
+			//}
 		}	
 	}
 	DrawScoreMenus();
