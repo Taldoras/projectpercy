@@ -14,6 +14,8 @@ var catLifeMenuTexture : Texture2D;
 var gameOverScreen : GameOverMenu;
 var gameOver : boolean = false;
 
+var gameOverWinnerNameStyle : GUIStyle;
+
 private var TRANS_VIEW_ID = 0;  //enumeration for transform and animation viewIDs
 private var ANIM_VIEW_ID = 1;
 
@@ -25,6 +27,7 @@ class PlayerInfo
 	var playerTransform : Transform;
 	var ready : boolean = false;
 	var score : int = 0;
+	var playerName : String;
 }
 
 function DrawGameOver()
@@ -73,6 +76,7 @@ function DrawScoreMenus()
 			GUI.Label(Rect(x,y,256,70), catScoreMenuTexture);
 
 			var playerinstance : PlayerInfo = playerInfo[currentPlayerIndex];
+			GUI.Label(Rect(x+60,y+10,256,100),playerinstance.playerName, gameOverWinnerNameStyle);
 			for ( var i=0; i<=(8+playerinstance.score); i=i+1)
 			{
 				var currentX = x + i*(picDimensionX-6);
@@ -223,6 +227,19 @@ function setPlayerScore(transformViewID : NetworkViewID, score : int)
 	}
 }
 
+function setPlayerName(transformViewID : NetworkViewID, name : String)
+{
+	var playerInstance = getPlayer(transformViewID);
+	if(playerInstance)
+	{
+		networkView.RPC("updatePlayerName",RPCMode.All, playerInstance.transformViewID, name);
+	}
+	else
+	{
+		Debug.Log("SpawnTracker.setPlayerName: Player not found!");
+	}
+}
+
 function getPlayer(transformViewID : NetworkViewID)
 {
 	var tagetPlayer : PlayerInfo = null;
@@ -355,6 +372,17 @@ function updateScore(transformViewID : NetworkViewID, score : int)
 	{
 			Debug.Log("updateScore: "+score);
 			playerInstance.score = score;
+	}
+}
+
+@RPC
+function updatePlayerName(transformViewID : NetworkViewID, name : String)
+{
+	var playerInstance : PlayerInfo = getPlayer(transformViewID);
+	if(playerInstance)
+	{
+			Debug.Log("updateName: "+name);
+			playerInstance.playerName = name;
 	}
 }
 
