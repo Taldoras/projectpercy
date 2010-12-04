@@ -16,6 +16,8 @@ function Start()
 	//go get player name
 	globalState = GameObject.Find("GlobalState").GetComponent(GlobalState);
 	playerName = globalState.playerName;
+	
+	spawnManager.setPlayerName(playerId, playerName);
 }
 
 function Update () 
