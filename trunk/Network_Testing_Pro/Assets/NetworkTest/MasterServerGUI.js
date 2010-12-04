@@ -44,6 +44,7 @@ function OnFailedToConnectToMasterServer(info: NetworkConnectionError)
 
 function OnFailedToConnect(info: NetworkConnectionError)
 {
+	connected = false;
 	Debug.Log("Failed to connect!");
 	Debug.Log(info);
 }
@@ -74,6 +75,7 @@ function Start()
 var gotStartTime = false;
 var startTime;
 var startedServer = false;
+var triedLocal = false;
 
 function Update()
 {
@@ -107,10 +109,23 @@ function Update()
 					
 					if ( timeDiff.TotalSeconds > 3 )
 					{
-						Debug.Log("MasterServerGUI Update() starting server ");
-						Network.InitializeServer(32, listenPort);
-						MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
-						connected = true;
+						if ( triedLocal )
+						{
+							Debug.Log("MasterServerGUI Update() starting server ");
+							Network.InitializeServer(32, listenPort);
+							MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
+							connected = true;
+						}
+					}
+					else
+					{
+						if ( !triedLocal )
+						{
+							Network.useNat = false;
+							Network.Connect("127.0.0.1", listenPort);
+							connected = true;
+							triedLocal = true;
+						}
 					}
 				}
 			}
