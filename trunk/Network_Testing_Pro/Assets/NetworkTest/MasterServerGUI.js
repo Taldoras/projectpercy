@@ -30,7 +30,6 @@ private var hideTest = false;
 private var testMessage = "Undetermined NAT capabilities";
 private var runDedicated = false;
 private var directConnect = false;
-private var failedToConnect = false;
 
 private var spawnTracker : SpawnTracker;
 
@@ -39,16 +38,15 @@ private var spawnTracker : SpawnTracker;
 
 function OnFailedToConnectToMasterServer(info: NetworkConnectionError)
 {
-	Debug.Log("Connection to Master Server failed!");
-	Debug.Log(info);
+	//Debug.Log("Connection to Master Server failed!");
+	//Debug.Log(info);
 }
 
 function OnFailedToConnect(info: NetworkConnectionError)
 {
 	connected = false;
-	failedToConnect = true;
-	Debug.Log("Failed to connect!");
-	Debug.Log(info);
+	//Debug.Log("Failed to connect!");
+	//Debug.Log(info);
 }
 
 function Awake()
@@ -62,7 +60,7 @@ function Awake()
 	var data : HostData[] = MasterServer.PollHostList();
 	if ( data.length <= 0 )
 	{
-		Debug.Log("MasterServerGUI Awake() starting server ");
+		//Debug.Log("MasterServerGUI Awake() starting server ");
 		Network.InitializeServer(32, listenPort);
 		MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
 	}
@@ -87,10 +85,10 @@ function Update()
 		{
 			MasterServer.RequestHostList(gameName);
 			var data : HostData[] = MasterServer.PollHostList();
-			Debug.Log("MasterServerGUI Update() data length = " + data.length);
-			if ( data.length > 0 && !Network.isServer && !failedToConnect)
+			//Debug.Log("MasterServerGUI Update() data length = " + data.length);
+			if ( data.length > 0 && !Network.isServer)
 			{
-				//Debug.Log("MasterServerGUI Update() connecting to server: data[0].ip: " + data[0].ip + " data[0].port: " + data[0].port);
+				////Debug.Log("MasterServerGUI Update() connecting to server: data[0].ip: " + data[0].ip + " data[0].port: " + data[0].port);
 				// How can I tell that if the IP address is from a private network?
 				Network.useNat = false;
 				Network.Connect(data[0].ip, data[0].port);
@@ -98,7 +96,7 @@ function Update()
 			}
 			else
 			{
-				Debug.Log("MasterServerGUI Update() no server to connect to ");
+				//Debug.Log("MasterServerGUI Update() no server to connect to ");
 				if (!gotStartTime)
 				{
 					startTime = System.DateTime.Now;
@@ -113,7 +111,7 @@ function Update()
 					{
 						if ( triedLocal )
 						{
-							Debug.Log("MasterServerGUI Update() starting server ");
+							//Debug.Log("MasterServerGUI Update() starting server ");
 							Network.InitializeServer(32, listenPort);
 							MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
 							connected = true;
@@ -137,7 +135,7 @@ function Update()
 			if ( Network.peerType != NetworkPeerType.Disconnected && !spawnTracker.isLocalInitialized() )
 			{
 				var playerInstance : PlayerInfo  = spawnTracker.InitServerPlayer();
-				spawnTracker.SpawnServerPlayer(playerInstance.transformViewID, playerInstance.animationViewID);
+				spawnTracker.SpawnServerPlayer(playerInstance.transformViewID, playerInstance.animationViewID, playerInstance.textureID);
 			}
 		}
 	}
@@ -193,7 +191,7 @@ function TestConnection() {
 			// If no NAT punchthrough test has been performed on this public IP, force a test
 			if (!probingPublicIP)
 			{
-				Debug.Log("Testing if firewall can be circumnvented");
+				//Debug.Log("Testing if firewall can be circumnvented");
 				natCapable = Network.TestConnectionNAT();
 				probingPublicIP = true;
 				timer = Time.time + 10;
@@ -212,7 +210,7 @@ function TestConnection() {
 		default: 
 			testMessage = "Error in test routine, got " + natCapable;
 	}
-	Debug.Log(natCapable + " " + probingPublicIP + " " + doneTesting + " " + testMessage);
+	//Debug.Log(natCapable + " " + probingPublicIP + " " + doneTesting + " " + testMessage);
 }
 
 function MakeWindow (id : int) 
