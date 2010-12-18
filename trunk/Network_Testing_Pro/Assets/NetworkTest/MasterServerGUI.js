@@ -30,6 +30,7 @@ private var hideTest = false;
 private var testMessage = "Undetermined NAT capabilities";
 private var runDedicated = false;
 private var directConnect = false;
+private var failedToConnect = false;
 
 private var spawnTracker : SpawnTracker;
 
@@ -45,6 +46,7 @@ function OnFailedToConnectToMasterServer(info: NetworkConnectionError)
 function OnFailedToConnect(info: NetworkConnectionError)
 {
 	connected = false;
+	failedToConnect = true;
 	//Debug.Log("Failed to connect!");
 	//Debug.Log(info);
 }
@@ -86,7 +88,7 @@ function Update()
 			MasterServer.RequestHostList(gameName);
 			var data : HostData[] = MasterServer.PollHostList();
 			//Debug.Log("MasterServerGUI Update() data length = " + data.length);
-			if ( data.length > 0 && !Network.isServer)
+			if ( data.length > 0 && !Network.isServer && !failedToConnect)
 			{
 				////Debug.Log("MasterServerGUI Update() connecting to server: data[0].ip: " + data[0].ip + " data[0].port: " + data[0].port);
 				// How can I tell that if the IP address is from a private network?
