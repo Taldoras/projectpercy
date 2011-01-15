@@ -8,19 +8,14 @@ private var thirdPersonStatus : ThirdPersonStatus = null;
 private var tempTexIndex = 0;
 private var GUS = null;
 private var renderMenu = false;
-private var catMeshes = null;
+private var sumoCatRenderers = null;
 
 function Start () 
 {
-	//catMesh = GetComponentInChildren (MeshRenderer);
-	catMeshes = GetComponentsInChildren (MeshRenderer);
-
-    isnull = catMeshes == null;
-	//Debug.Log("The catMeshes is  "+isnull);
-	spawnTracker =GameObject.Find("SpawnPoint").GetComponent(SpawnTracker);
+	spawnTracker = GameObject.Find("SpawnPoint").GetComponent(SpawnTracker);
 	thirdPersonStatus = GetComponent("ThirdPersonStatus");
 	GUS = GetComponent("GraduallyUpdateState");
-	//Debug.Log("Hello this is mat sel start");
+	sumoCatRenderers =  this.gameObject.GetComponentsInChildren(Renderer);
 	setPlayerTexture(textureIndex);
 	tempTexIndex = textureIndex;
 	//Debug.Log("post renderer ");
@@ -61,11 +56,11 @@ function setPlayerTexture( texIdx : int )
 {
 	if( texIdx >= 0 && texIdx < catTextures.length )
 	{
-		textureIndex = texIdx;
-		for (var catRender : MeshRenderer in catMeshes) 
+		textureIndex = texIdx;		
+		for( i = 0; i < sumoCatRenderers.length; i++)
 		{
-			catRender.renderer.material.mainTexture = catTextures[textureIndex];
-		}	
+			sumoCatRenderers[i].material.mainTexture = catTextures[textureIndex];
+		}
 	}
 	else
 	{
