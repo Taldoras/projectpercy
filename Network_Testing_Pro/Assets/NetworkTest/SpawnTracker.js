@@ -14,6 +14,7 @@ var catScoreMenuTexture : Texture2D;
 var catLifeMenuTexture : Texture2D;
 var gameOverScreen : GameOverMenu;
 var gameOver : boolean = false;
+var gameOverWinnerName : String;
 
 var gameOverWinnerNameStyle : GUIStyle;
 
@@ -44,6 +45,7 @@ function getCurrentTextureID()
 function DrawGameOver()
 {
 	gameOverScreen.gameOverVisible = gameOver;
+	gameOverScreen.gameOverWinnerName = gameOverWinnerName;
 }
 
 function OnGUI () 
@@ -96,6 +98,7 @@ function DrawScoreMenus()
 			if (playerinstance.score > -9)
 			{
 				playersAliveCount++;
+				gameOverWinnerName = playerinstance.playerName; //hacky way to have the winner's name later.
 			}
 			currentPlayerIndex++;
 		}
@@ -105,6 +108,7 @@ function DrawScoreMenus()
 			if(playersAliveCount < 1)
 			{
 				gameOver = true;
+				
 			}
 		}
 		else
