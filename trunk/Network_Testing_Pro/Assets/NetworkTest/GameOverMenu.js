@@ -1,9 +1,11 @@
 var gameOverVisible : boolean = false;
 var gameOverWinnerStyle : GUIStyle;
+var gameOverWinnerName : String;
 var gameOverWinnerNameStyle : GUIStyle;
 var roundOverStyle : GUIStyle;
 var btnStyle : GUIStyle;
 var gameOverPaw : Texture2D;
+
 
 function OnGUI(){
 	
@@ -14,7 +16,7 @@ function OnGUI(){
 		GUI.BeginGroup(new Rect(scrW/2 - 150,scrH/2 -150,800,800));
 		
 		GUI.Label(Rect(0,0,300,100), "Winner...", gameOverWinnerStyle);
-		GUI.Label(Rect(25,40,500,100), "PlayerName", gameOverWinnerNameStyle);
+		GUI.Label(Rect(25,40,500,100), gameOverWinnerName, gameOverWinnerNameStyle);
 		GUI.Label(Rect(90, 100, 500, 500), gameOverPaw);
 		GUI.Label(Rect(0,225,300,100), "ROUND OVER", roundOverStyle);
 		
