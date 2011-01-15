@@ -317,7 +317,7 @@ function InitServerPlayer()
 	return playerInstance;
 }
 
-function SpawnServerPlayer(transformViewID, animationViewID, textureID)
+function SpawnServerPlayer(transformViewID, animationViewID, textureID, localPlay, firstSetOfControls)
 {
 	var playerInstance = getPlayer(transformViewID);
 	if( playerInstance == null )
@@ -354,13 +354,30 @@ function SpawnServerPlayer(transformViewID, animationViewID, textureID)
 	Debug.Log("Enabling user input as this is the server player");
 	// W are doing client prediction and thus enable the controller script + user input processing
 	//instantiatedPlayer.GetComponent(ThirdPersonController).enabled = true;
-	instantiatedPlayer.GetComponent(ThirdPersonController).getUserInput = true;
 	// Enable input network synchronization (server gets input)
 	instantiatedPlayer.GetComponent(NetworkController).enabled = true;
 	instantiatedPlayer.SendMessage("SetOwnership");
-	var camObj : GameObject = GameObject.FindWithTag("MainCamera");
-	var followCam : SmoothLookAt = camObj.GetComponent(SmoothLookAt);
-	followCam.target = instantiatedPlayer;
+	
+	if ( localPlay )
+	{
+		instantiatedPlayer.GetComponent(ThirdPersonController).getUserInput = true;
+		if ( firstSetOfControls )
+		{
+			instantiatedPlayer.GetComponent(ThirdPersonController).player1 = true;
+		}
+		else
+		{
+			instantiatedPlayer.GetComponent(ThirdPersonController).player2 = true;
+		}
+	}
+	else
+	{
+		instantiatedPlayer.GetComponent(ThirdPersonController).getUserInput = true;
+
+		var camObj : GameObject = GameObject.FindWithTag("MainCamera");
+		var followCam : SmoothLookAt = camObj.GetComponent(SmoothLookAt);
+		followCam.target = instantiatedPlayer;
+	}
 	
 	Debug.Log("There are now " + playerInfo.length + " players active");
 	

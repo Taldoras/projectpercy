@@ -79,6 +79,8 @@ public var horizontalInput : float;
 public var jumpButton : boolean;
 
 public var getUserInput : boolean = true;
+public var player1 : boolean = false;
+public var player2 : boolean = false;
 
 function Awake ()
 {
@@ -111,9 +113,26 @@ function UpdateSmoothedMovementDirection ()
 	// Always orthogonal to the forward vector
 	var right = Vector3(forward.z, 0, -forward.x);
 
-	if (getUserInput) {
-		verticalInput = Input.GetAxisRaw("Vertical");
-		horizontalInput = Input.GetAxisRaw("Horizontal");
+	if (getUserInput) 
+	{
+		if ( player1 || player2 )
+		{
+			if ( player1 )
+			{
+				verticalInput = Input.GetAxisRaw("Player 1 Vertical");
+				horizontalInput = Input.GetAxisRaw("Player 1 Horizontal");
+			}
+			else if ( player2 )
+			{
+				verticalInput = Input.GetAxisRaw("Player 2 Vertical");
+				horizontalInput = Input.GetAxisRaw("Player 2 Horizontal");			
+			}
+		}
+		else
+		{
+			verticalInput = Input.GetAxisRaw("Player 1 Vertical");
+			horizontalInput = Input.GetAxisRaw("Player 1 Horizontal");
+		}
 	}
 
 	// Are we moving backwards or looking backwards
@@ -253,8 +272,24 @@ function ApplyJumping ()
 function ApplyGravity ()
 {
 	// Apply gravity
-	if (getUserInput)
-		jumpButton = Input.GetButton("Jump");
+	if (getUserInput) 
+	{
+		if ( player1 || player2 )
+		{
+			if ( player1 )
+			{
+				jumpButton = Input.GetButton("Player 1 Jump");
+			}
+			else if ( player2 )
+			{
+				jumpButton = Input.GetButton("Player 2 Jump");
+			}
+		}
+		else
+		{
+			jumpButton = Input.GetButton("Player 1 Jump");
+		}
+	}
 	
 	// * When falling down we use capeFlyGravity (only when holding down jump)
 	var capeFly = canCapeFly && verticalSpeed <= 0.0 && jumpButton && jumping;
@@ -300,8 +335,24 @@ function DidJump ()
 function Update() {
 
 	if (getUserInput) {
-		if (Input.GetButtonDown ("Jump"))
-			lastJumpButtonTime = Time.time;
+		if ( player1 || player2 )
+		{
+			if ( player1 )
+			{
+				if (Input.GetButtonDown ("Player 1 Jump"))
+					lastJumpButtonTime = Time.time;
+			}
+			else if ( player2 )
+			{
+				if (Input.GetButtonDown ("Player 2 Jump"))
+					lastJumpButtonTime = Time.time;
+			}
+		}
+		else
+		{
+			if (Input.GetButtonDown ("Player 1 Jump"))
+				lastJumpButtonTime = Time.time;
+		}
 	}
 	else {
 		if (jumpButton)
@@ -453,7 +504,23 @@ function IsCapeFlying ()
 {
 	// * When falling down we use capeFlyGravity (only when holding down jump)
 	if (getUserInput)
-		jumpButton = Input.GetButton("Jump");
+	{
+		if ( player1 || player2 )
+		{
+			if ( player1 )
+			{
+				jumpButton = Input.GetButton("Player 1 Jump");
+			}
+			else if ( player2 )
+			{
+				jumpButton = Input.GetButton("Player 2 Jump");
+			}
+		}
+		else
+		{
+			jumpButton = Input.GetButton("Player 1 Jump");
+		}
+	}
 	return canCapeFly && verticalSpeed <= 0.0 && jumpButton && jumping;
 }
 
