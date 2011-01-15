@@ -85,51 +85,63 @@ function Update()
 	{
 		if (!connected)
 		{
-			MasterServer.RequestHostList(gameName);
-			var data : HostData[] = MasterServer.PollHostList();
-			//Debug.Log("MasterServerGUI Update() data length = " + data.length);
-			if ( data.length > 0 && !Network.isServer && !failedToConnect)
+			if (!gState.localplay)
 			{
-				////Debug.Log("MasterServerGUI Update() connecting to server: data[0].ip: " + data[0].ip + " data[0].port: " + data[0].port);
-				// How can I tell that if the IP address is from a private network?
-				Network.useNat = false;
-				Network.Connect(data[0].ip, data[0].port);
-				connected = true;
-			}
-			else
-			{
-				//Debug.Log("MasterServerGUI Update() no server to connect to ");
-				if (!gotStartTime)
+				MasterServer.RequestHostList(gameName);
+				var data : HostData[] = MasterServer.PollHostList();
+				//Debug.Log("MasterServerGUI Update() data length = " + data.length);
+				if ( data.length > 0 && !Network.isServer && !failedToConnect)
 				{
-					startTime = System.DateTime.Now;
-					gotStartTime = true;
+					////Debug.Log("MasterServerGUI Update() connecting to server: data[0].ip: " + data[0].ip + " data[0].port: " + data[0].port);
+					// How can I tell that if the IP address is from a private network?
+					Network.useNat = false;
+					Network.Connect(data[0].ip, data[0].port);
+					connected = true;
 				}
 				else
 				{
-					var currentTime = System.DateTime.Now;
-					var timeDiff = currentTime.Subtract(startTime);
-					
-					if ( timeDiff.TotalSeconds > 3 )
+					//Debug.Log("MasterServerGUI Update() no server to connect to ");
+					if (!gotStartTime)
 					{
-						if ( triedLocal )
-						{
-							//Debug.Log("MasterServerGUI Update() starting server ");
-							Network.InitializeServer(32, listenPort);
-							MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
-							connected = true;
-						}
+						startTime = System.DateTime.Now;
+						gotStartTime = true;
 					}
 					else
 					{
-						if ( !triedLocal )
+						var currentTime = System.DateTime.Now;
+						var timeDiff = currentTime.Subtract(startTime);
+						
+						if ( timeDiff.TotalSeconds > 3 )
 						{
-							Network.useNat = false;
-							Network.Connect("127.0.0.1", listenPort);
-							connected = true;
-							triedLocal = true;
+							if ( triedLocal )
+							{
+								//Debug.Log("MasterServerGUI Update() starting server ");
+								Network.InitializeServer(32, listenPort);
+								MasterServer.RegisterHost(gameName, "Tons of fun!", "Knock the fat bastard off!");
+								connected = true;
+							}
+						}
+						else
+						{
+							if ( !triedLocal )
+							{
+								Network.useNat = false;
+								Network.Connect("127.0.0.1", listenPort);
+								connected = true;
+								triedLocal = true;
+							}
 						}
 					}
 				}
+			}
+			else
+			{
+				Network.InitializeServer(32, listenPort);
+								
+				//Network.useNat = false;
+				//Network.Connect("127.0.0.1", listenPort);
+				connected = true;
+				//triedLocal = true;
 			}
 		}
 		else
@@ -137,7 +149,12 @@ function Update()
 			if ( Network.peerType != NetworkPeerType.Disconnected && !spawnTracker.isLocalInitialized() )
 			{
 				var playerInstance : PlayerInfo  = spawnTracker.InitServerPlayer();
-				spawnTracker.SpawnServerPlayer(playerInstance.transformViewID, playerInstance.animationViewID, playerInstance.textureID);
+				spawnTracker.SpawnServerPlayer(playerInstance.transformViewID, playerInstance.animationViewID, playerInstance.textureID, gState.localplay, true);
+				if (gState.localplay)
+				{
+					var playerInstance2 : PlayerInfo = spawnTracker.InitServerPlayer();
+					spawnTracker.SpawnServerPlayer(playerInstance2.transformViewID, playerInstance2.animationViewID, playerInstance2.textureID, gState.localplay, false);
+				}
 			}
 		}
 	}

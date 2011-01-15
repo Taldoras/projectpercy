@@ -14,6 +14,13 @@ if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +10, 100, 20), GUIContent ("Quick Play"
 	startQuickplay();
 }
 
+if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +40, 100, 20), GUIContent ("Local Play", "Play with two players on the same computer.")))
+{
+	print("localplay clicked");
+	startLocalplay();
+}
+
+
 /*
  * Login disabled
 if(GUI.Button (Rect ( scrW/2 -50, scrH/2 +50, 100, 20), GUIContent ("Login", "Logging in allows you to save your cat!")))
@@ -45,6 +52,19 @@ function startQuickplay() {
 	//set player's name
 	var playerName = getQuickName();
 	gState.playerName = playerName;
+		
+	// start it up!
+	Application.LoadLevel("Scene1");
+	
+}
+
+
+function startLocalplay() {
+	
+	//set player's name
+	var playerName = getQuickName();
+	gState.playerName = playerName;
+	gState.localplay = true;
 		
 	// start it up!
 	Application.LoadLevel("Scene1");
