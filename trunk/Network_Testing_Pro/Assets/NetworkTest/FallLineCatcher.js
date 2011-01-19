@@ -30,6 +30,7 @@ function OnTriggerEnter (other : Collider)
 
 function respawnPlayer(tPS)
 {
+	/*
 	if(!respawning)
 	{
 		respawning = true;
@@ -40,6 +41,9 @@ function respawnPlayer(tPS)
 		
 		respawning = false;
 	}
+	*/
+	yield WaitForSeconds(3);
+	tPS.Respawn();
 }
 
 /*
