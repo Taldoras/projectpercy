@@ -65,7 +65,9 @@ function startLocalplay() {
 	var playerName = getQuickName();
 	gState.playerName = playerName;
 	gState.localplay = true;
-		
+	
+	gState.playerName2 = getQuickName();
+	
 	// start it up!
 	Application.LoadLevel("Scene1");
 	

@@ -16,11 +16,12 @@ function Start ()
 	thirdPersonStatus = GetComponent("ThirdPersonStatus");
 	GUS = GetComponent("GraduallyUpdateState");
 	sumoCatRenderers =  this.gameObject.GetComponentsInChildren(Renderer);
+	textureIndex = Random.Range(0,4);
 	setPlayerTexture(textureIndex);
 	tempTexIndex = textureIndex;
 	//Debug.Log("post renderer ");
 	//Debug.Log("ST.get is "+spawnTracker.getLocalTransformViewID()+" tps.id "+thirdPersonStatus.getPlayerID());
-	renderMenu = spawnTracker.getLocalTransformViewID() == thirdPersonStatus.getPlayerID();
+	renderMenu = false;//spawnTracker.getLocalTransformViewID() == thirdPersonStatus.getPlayerID();
 	//Debug.Log("Render window is: "+renderMenu);
 }
 
